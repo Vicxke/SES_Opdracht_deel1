@@ -1,4 +1,4 @@
 package be.kuleuven.candycrush.view;
 
-public class View {
+public class CandyCrushView {
 }
