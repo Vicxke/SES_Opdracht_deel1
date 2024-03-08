@@ -3,9 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-
-<Pane fx:id="Paneel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
+<Pane fx:controller="be.kuleuven.candycrush.CandyCrushMainMenuController" fx:id="Paneel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Button fx:id="Startbtn" layoutX="274.0" layoutY="174.0" mnemonicParsing="false" text="Start" />
+      <Button fx:id="Startbtn" layoutX="274.0" layoutY="174.0" mnemonicParsing="false" text="Login" />
    </children>
 </Pane>
