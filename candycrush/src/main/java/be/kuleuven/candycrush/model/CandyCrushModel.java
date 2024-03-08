@@ -82,6 +82,12 @@ public class CandyCrushModel {
         score+= waarde;
     }
 
+    public void resetGame(){
+        score = 0;
+        grid.clear();
+        GenerateGrid();
+    }
+
 
     public ArrayList<Integer> getGrid() {
         return grid;

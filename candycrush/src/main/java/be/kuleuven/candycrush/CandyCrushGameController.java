@@ -3,7 +3,9 @@ package be.kuleuven.candycrush;
 import be.kuleuven.candycrush.model.CandyCrushModel;
 import be.kuleuven.candycrush.view.CandyCrushView;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -23,12 +25,29 @@ public class CandyCrushGameController {
     private Label lblScore;
 
     @FXML
-    private void initialize(/*CandyCrushModel model*/){
+    private Button btnResetGame;
+
+    @FXML
+    private Label lblNaamSpeler;
+
+    @FXML
+    private void initialize(){
         this.game = new CandyCrushModel(10, 10);
         this.view  = new CandyCrushView(game, gameView, speelveld, lblScore);
+
         updateView();
+
+        btnResetGame.setOnMouseClicked(Event->resetGame());
     }
 
+    public void resetGame(){
+        game.resetGame();
+        view.update();
+    }
+
+    public void setNaamSpeler(String naamSpeler) {
+        lblNaamSpeler.setText(naamSpeler);
+    }
 
     public void updateView(){
         view.update();

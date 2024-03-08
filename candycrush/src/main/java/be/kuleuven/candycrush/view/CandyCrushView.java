@@ -7,6 +7,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Text;
 
 public class CandyCrushView extends Region {
@@ -26,6 +27,7 @@ public class CandyCrushView extends Region {
     }
 
     public void update(){
+        lblbScore.setText(String.valueOf(game.getScore()));
         speelVeld.getChildren().clear();
         double circleWidth = game.getCircleRadius();//(speelveld.getPrefWidth() / game.getVeldBreedte()); //57
         //double circleHeight = (speelveld.getPrefHeight() / game.getVeldHooghte()); //40
@@ -67,10 +69,8 @@ public class CandyCrushView extends Region {
     }
 
     public void onCircleClick(MouseEvent e){
-        Circle clickedCircle = (Circle) e.getSource();
-        game.onCircleClick(clickedCircle.getTranslateX(), clickedCircle.getTranslateY());
-        int score = game.getScore();
-        lblbScore.setText(String.valueOf(score));
+        Shape object = (Shape) e.getSource();
+        game.onCircleClick(object.getTranslateX(), object.getTranslateY());
         update();
     }
 }

@@ -6,7 +6,8 @@
 <AnchorPane fx:id="gameView" prefHeight="502.0" prefWidth="682.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="be.kuleuven.candycrush.CandyCrushGameController">
    <children>
       <AnchorPane fx:id="speelveld" layoutX="55.0" layoutY="87.0" prefHeight="329.0" prefWidth="572.0" />
-      <Label layoutX="32.0" layoutY="24.0" text="Naam Speler" />
+      <Label fx:id="lblNaamSpeler" layoutX="32.0" layoutY="24.0" text="Naam Speler" />
       <Label fx:id="lblScore" layoutX="535.0" layoutY="33.0" text="Score: " />
+      <Button fx:id="btnResetGame" layoutX="589.0" layoutY="29.0" mnemonicParsing="false" text="ResetGame" />
    </children>
 </AnchorPane>
