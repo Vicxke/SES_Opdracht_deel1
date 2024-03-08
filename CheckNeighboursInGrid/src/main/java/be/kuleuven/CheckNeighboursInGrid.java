@@ -6,6 +6,14 @@ public class CheckNeighboursInGrid {
     public CheckNeighboursInGrid() {
     }
 
+    public static void main(String[] args) {
+        Integer[] gridArray = {0, 0, 1, 0, 1, 1, 0, 2, 2, 0, 1, 3, 0, 1, 1, 1};
+        List<Integer> grid = Arrays.asList(gridArray);
+
+        System.out.println(getSameNeighboursIds(grid, 4, 4, 7));//14
+        CheckNeighboursInGrid test = new CheckNeighboursInGrid();
+    }
+
     /**
      * This method takes a 1D Iterable and an element in the array and gives back an iterable containing the indexes of all neighbours with the same value as the specified element
      *@return - Returns a 1D Iterable of ints, the Integers represent the indexes of all neighbours with the same value as the specified element on index 'indexToCheck'.
@@ -16,8 +24,8 @@ public class CheckNeighboursInGrid {
      */
     public static Iterable<Integer> getSameNeighboursIds(Iterable<Integer> grid,int width, int height, int indexToCheck){
         List<Integer> result = new ArrayList<>();
-        for (int i = -1; i <= 1; i++){
-            for(int j = -1; j<= 1; j++){
+        for (int i = -1; i <= 1; i++){//kollom
+            for(int j = -1; j<= 1; j++){//rij
                 //index to check +1 -1 of 0
                 //en de rij erboven of eronder de de breedte van een rij = kolom grote
                 int indexOtherValue = indexToCheck + j + (i * width);
@@ -26,7 +34,17 @@ public class CheckNeighboursInGrid {
                     Integer otherValue = ((List<Integer>) grid).get(indexOtherValue);
                     //kijk of de waardes dezelfde zijn en zien dat de index niet hetzelfde is
                     if (otherValue.equals(((List<Integer>) grid).get(indexToCheck)) && indexOtherValue != indexToCheck) {
-                        result.add(indexOtherValue);
+                        //de randen checken anders gaat deze gewoon door
+                        if(j == 1){
+                            if(indexOtherValue%width != 0){
+                                result.add(indexOtherValue);
+                            }
+                        } else if (j == -1) {
+                            if(indexToCheck%width != 0){
+                                result.add(indexOtherValue);
+                            }
+                        }
+
                     }
                 }
             }
