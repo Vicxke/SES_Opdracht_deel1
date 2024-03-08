@@ -7,10 +7,10 @@ public class CheckNeighboursInGrid {
     }
 
     public static void main(String[] args) {
-        Integer[] gridArray = {0, 0, 1, 0, 1, 1, 0, 2, 2, 0, 1, 3, 0, 1, 1, 1};
+        Integer[] gridArray = {0, 0, 1, 0, 1, 1, 0, 2, 1, 0, 1, 3, 0, 1, 1, 1};
         List<Integer> grid = Arrays.asList(gridArray);
 
-        System.out.println(getSameNeighboursIds(grid, 4, 4, 7));//14
+        System.out.println(getSameNeighboursIds(grid, 4, 4, 8));//14
         CheckNeighboursInGrid test = new CheckNeighboursInGrid();
     }
 
@@ -43,6 +43,8 @@ public class CheckNeighboursInGrid {
                             if(indexToCheck%width != 0){
                                 result.add(indexOtherValue);
                             }
+                        }else if(j == 0){
+                            result.add(indexOtherValue);
                         }
 
                     }
