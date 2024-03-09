@@ -14,9 +14,8 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
+  test:
+    runs-on: windows-latest
     permissions:
       contents: read
 
