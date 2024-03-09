@@ -17,9 +17,12 @@ public class CandyCrushModel {
     private int circleRadius;
     private int score;
 
+    private String playerName;
+
     private ArrayList<Integer> grid;
 
     public CandyCrushModel(int veldBreedte, int veldHooghte) {
+        playerName = "Default Player";
         this.circleRadius = 30;
         this.score = 0;
         this.veldBreedte = veldBreedte;
@@ -37,9 +40,6 @@ public class CandyCrushModel {
     }
 
     public void onCircleClick(double x, double y){
-        //Circle clickedCircle = (Circle) e.getSource();
-        //System.out.println("Circle clicked! Center X: " + clickedCircle.getTranslateX() + ", Center Y: " + clickedCircle.getTranslateY());
-
         //index to check wordt hieronder uigerekend
         double xCoordInArray = (x - (double) (circleRadius /2)) / circleRadius;
         double yCoordInArray = (y - (double) (circleRadius /2)) / circleRadius;
@@ -57,7 +57,7 @@ public class CandyCrushModel {
         //er klopt nog iets niet aan deze functie denk ik aangezien de teruggegeven index voor geen hol klopt
         Iterable<Integer> buren = getSameNeighboursIds(grid, veldBreedte, veldHooghte, index);//geeft een lijst met buren terug die hetzelfde zijn
         Iterator iterator = buren.iterator();
-        System.out.println(buren);
+        //System.out.println(buren);
 
         int count = 1;
         for (Object i : buren){
@@ -78,7 +78,7 @@ public class CandyCrushModel {
         Random rndGen = new Random();
         grid.set(index, rndGen.nextInt(1,6));
     }
-    private void addScore(int waarde){
+    public void addScore(int waarde){
         score+= waarde;
     }
 
@@ -107,5 +107,13 @@ public class CandyCrushModel {
 
     public int getScore() {
         return score;
+    }
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
+
+    public String getPlayerName() {
+        return playerName;
     }
 }

@@ -46,6 +46,7 @@ public class CandyCrushGameController {
     }
 
     public void setNaamSpeler(String naamSpeler) {
+        game.setPlayerName(naamSpeler);
         lblNaamSpeler.setText(naamSpeler);
     }
 
