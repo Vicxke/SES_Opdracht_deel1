@@ -46,14 +46,6 @@ public class modelTest {
     }
 
     @Test
-    public void checkIfScoreIncreasedAfterCheckAlleBuren() {
-        game.resetGame();
-        game.CheckAlleBuren(0);
-        assertTrue(game.getScore() >= 0);
-        assertTrue(game.getScore() < 4);
-    }
-
-    @Test
     public void ScoreNeedsToBe4WhenInTopLeftCorner() {
         game.resetGame();
         game.getGrid().set(0,2);
@@ -70,6 +62,15 @@ public class modelTest {
             game.getGrid().set(i, 3);
         }
         game.CheckAlleBuren(49); //rechtse muur
+        assertEquals(6, game.getScore());
+    }
+
+    @Test
+    public void CheckScoreOnMiddleLeftSide() {
+        for (int i = 0; i < game.getGrid().size(); i++) {
+            game.getGrid().set(i, 3);
+        }
+        game.CheckAlleBuren(50); //linkse muur
         assertEquals(6, game.getScore());
     }
 
