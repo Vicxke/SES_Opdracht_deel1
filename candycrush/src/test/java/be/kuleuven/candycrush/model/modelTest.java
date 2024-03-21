@@ -15,8 +15,8 @@ public class modelTest {
     @Test
     public void CheckGridSize(){
         assertEquals(100, game.getGrid().size());
-        assertEquals(10, game.getVeldBreedte());
-        assertEquals(10, game.getVeldHooghte());
+        assertEquals(10, game.getBoard().breedte());
+        assertEquals(10, game.getBoard().hoogte());
     }
 
     @Test
@@ -83,6 +83,14 @@ public class modelTest {
     @Test
     public void testDefaultName(){
         assertEquals("Default Player", game.getPlayerName());
+    }
+
+    @Test
+    public void testIdexToPosition() {
+        //game.pos.blabla
+        //werkt niet
+        CandyCrushModel.Position pos = new CandyCrushModel.Position(5,5, new CandyCrushModel.BoardSize(10,10));
+        //System.out.println(pos.neighborPositions());
     }
 
 }

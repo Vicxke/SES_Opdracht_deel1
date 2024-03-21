@@ -31,9 +31,9 @@ public class CandyCrushView extends Region {
         speelVeld.getChildren().clear();
         double circleWidth = game.getCircleRadius();//(speelveld.getPrefWidth() / game.getVeldBreedte()); //57
         //double circleHeight = (speelveld.getPrefHeight() / game.getVeldHooghte()); //40
-        int b = game.getVeldBreedte();
-        for (int i = 0; i < game.getVeldBreedte(); i++) {
-            for (int j = 0; j < game.getVeldHooghte(); j++) {
+        int b = game.getBoard().breedte();
+        for (int i = 0; i < game.getBoard().breedte(); i++) {
+            for (int j = 0; j < game.getBoard().hoogte(); j++) {
                 double radius = circleWidth/2;
                 Circle c = new Circle(radius);
                 Text text = new Text(game.getGrid().get(i+b*j).toString());
