@@ -11,9 +11,6 @@ version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    flatDir{
-        dirs 'lib'
-    }
 }
 
 ext {
@@ -42,7 +39,6 @@ dependencies {
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-    implementation 'be.kuleuven:CheckNeighboursInGrid:1.0-SNAPSHOT'
 }
 
 test {

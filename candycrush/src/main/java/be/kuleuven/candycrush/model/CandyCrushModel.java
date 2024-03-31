@@ -1,14 +1,13 @@
 package be.kuleuven.candycrush.model;
 
-import be.kuleuven.CheckNeighboursInGrid;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import static be.kuleuven.CheckNeighboursInGrid.*;
 
 public class CandyCrushModel {
     private int circleRadius;
@@ -16,7 +15,7 @@ public class CandyCrushModel {
 
     private String playerName;
 
-    private ArrayList<Integer> grid;
+    private ArrayList<Candy> grid;
 
     private BoardSize board;
 
@@ -25,8 +24,8 @@ public class CandyCrushModel {
         this.circleRadius = 30;
         this.score = 0;
         board = new BoardSize(veldBreedte, veldHooghte);
-        this.grid = new ArrayList<>();
-        GenerateGrid();
+        this.grid = new ArrayList<Candy>();
+        generateGrid();
     }
 
     public record BoardSize(int breedte, int hoogte){
@@ -53,11 +52,11 @@ public class CandyCrushModel {
                 throw new IllegalArgumentException("hoogte is out of bounds");
             }
         }
-        int toIndex(){
+        public int toIndex(){
             return this.row * bord.breedte() + this.col;
         }
 
-        static Position fromIndex(int index, BoardSize size){
+        public static Position fromIndex(int index, BoardSize size){
             if(index > size.breedte() * size.hoogte() || index < 0){
                 throw new IllegalArgumentException("index bestaat niet");
             }else{
@@ -96,7 +95,7 @@ public class CandyCrushModel {
     //NormalCandy, met een attribuut color (een int met mogelijke waarden 0, 1, 2, of 3)
     public record NormalCandy(int color) implements Candy{
         public NormalCandy{
-            if(color <= 0 || color >= 3){
+            if(color < 0 || color > 3){
                 throw new IllegalArgumentException("color moet tussen 0 en 3 liggen");
             }
         }
@@ -107,53 +106,79 @@ public class CandyCrushModel {
     public record haaariebooo() implements Candy{}
 
 
-    public void GenerateGrid(){
+    public Candy generateRandomCandy(){
         Random rndGen = new Random();
+        int random = rndGen.nextInt(1,8);
+        switch (random){
+            case 1: return new NormalCandy(0);
+            case 2: return new NormalCandy(1);
+            case 3: return new NormalCandy(2);
+            case 4: return new NormalCandy(3);
+            case 5: return new Stheefje();
+            case 6: return new bolleke();
+            case 7: return new petoterke();
+            case 8: return new haaariebooo();
+            default: return null;
+        }
+    }
+
+    public void generateGrid(){
         for (int i = 0; i < board.breedte()*board.hoogte(); i++) {
-            int randomNum = rndGen.nextInt(1,6);
-            grid.add(randomNum);
+            grid.add(generateRandomCandy());
         }
     }
 
     public void onCircleClick(double x, double y){
         //index to check wordt hieronder uigerekend
-        double xCoordInArray = (x - (double) (circleRadius /2)) / circleRadius;
-        double yCoordInArray = (y - (double) (circleRadius /2)) / circleRadius;
-        int indexValue = (int)(xCoordInArray + (yCoordInArray*board.hoogte()));
-        System.out.println("index value to Check: " + indexValue);
-        CheckAlleBuren(indexValue);
+        double xCoordInArray = x / circleRadius;
+        double yCoordInArray = y / circleRadius;
+        int row = (int) Math.floor(yCoordInArray);
+        int col = (int) Math.floor(xCoordInArray);
+
+        System.out.println("row: " + row + " col: " + col);
+        //position van index ophalen
+        CheckAlleBuren(new Position(row, col, board));
     }
 
-    public void CheckAlleBuren(int index){
-        //eerst alle buren eruit halen en dan elke buur vergelijken.
+    public void CheckAlleBuren(Position coords){
 
-        CheckNeighboursInGrid gridChecker = new CheckNeighboursInGrid();
-        //int valueToCheck = grid.get(index);
-
-        //er klopt nog iets niet aan deze functie denk ik aangezien de teruggegeven index voor geen hol klopt
-        Iterable<Integer> buren = getSameNeighboursIds(grid, board.breedte(), board.hoogte(), index);//geeft een lijst met buren terug die hetzelfde zijn
+        Iterable<Position> buren  = getSameNeighbourPositions(coords);
         Iterator iterator = buren.iterator();
-        //System.out.println(buren);
+        System.out.println(buren);
 
+        //count op 1 zodat waarde zelf wordt meegeteld
         int count = 1;
         for (Object i : buren){
             count++;
         }
 
+        System.out.println(count);
+
         if(count >= 3) {
-            regenerateValue(index);
-            while (iterator.hasNext()) {
-                int indexBuur = (int) iterator.next();
-                regenerateValue(indexBuur);
-            }
             addScore(count);
+            grid.set(coords.toIndex(), generateRandomCandy());
+            while (iterator.hasNext()) {
+                Position posBuur = (Position) iterator.next();
+                grid.set(posBuur.toIndex(), generateRandomCandy());
+            }
         }
     }
 
-    public void regenerateValue(int index){
-        Random rndGen = new Random();
-        grid.set(index, rndGen.nextInt(1,6));
+    Iterable<Position> getSameNeighbourPositions(Position position){
+        //gebruik de neighborPositions functie om de posities van de buren te vinden
+        //en controleer of de waarde van de buur overeenkomt met de waarde van de positie
+        //return een iterable van posities die dezelfde waarde hebben als de positie
+        ArrayList<Position> buren = new ArrayList<>();
+        for(Position p : position.neighborPositions()){
+            //check if the cany is the same
+            if(grid.get(p.toIndex()).equals(grid.get(position.toIndex()))){
+                buren.add(p);
+            }
+        }
+        return buren;
     }
+
+
     public void addScore(int waarde){
         score+= waarde;
     }
@@ -161,14 +186,14 @@ public class CandyCrushModel {
     public void resetGame(){
         score = 0;
         grid.clear();
-        GenerateGrid();
+        generateGrid();
     }
 
     public BoardSize getBoard() {
         return board;
     }
 
-    public ArrayList<Integer> getGrid() {
+    public ArrayList<Candy> getGrid() {
         return grid;
     }
 
