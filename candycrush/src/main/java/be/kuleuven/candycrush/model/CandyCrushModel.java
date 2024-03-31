@@ -123,6 +123,7 @@ public class CandyCrushModel {
     }
 
     public void generateGrid(){
+        grid.clear();
         for (int i = 0; i < board.breedte()*board.hoogte(); i++) {
             grid.add(generateRandomCandy());
         }
@@ -144,7 +145,7 @@ public class CandyCrushModel {
 
         Iterable<Position> buren  = getSameNeighbourPositions(coords);
         Iterator iterator = buren.iterator();
-        System.out.println(buren);
+        //System.out.println(buren);
 
         //count op 1 zodat waarde zelf wordt meegeteld
         int count = 1;
@@ -152,7 +153,7 @@ public class CandyCrushModel {
             count++;
         }
 
-        System.out.println(count);
+        //System.out.println(count);
 
         if(count >= 3) {
             addScore(count);
@@ -185,7 +186,6 @@ public class CandyCrushModel {
 
     public void resetGame(){
         score = 0;
-        grid.clear();
         generateGrid();
     }
 
