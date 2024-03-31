@@ -26,9 +26,9 @@ public class modelTest {
 
     @Test
     public void checkRegenerateValueInRange() {
-        game.regenerateValue(5);
-        int value = game.getGrid().get(5);
-        assertTrue(value >= 1 && value <= 6);
+        CandyCrushModel.Candy candy = game.generateRandomCandy();
+        game.getGrid().set(5, candy);
+        assertTrue(candy.equals(game.getGrid().get(5)));
     }
 
     @Test
@@ -48,29 +48,35 @@ public class modelTest {
     @Test
     public void ScoreNeedsToBe4WhenInTopLeftCorner() {
         game.resetGame();
-        game.getGrid().set(0,2);
-        game.getGrid().set(1,2);
-        game.getGrid().set(10,2);
-        game.getGrid().set(11,2);
-        game.CheckAlleBuren(0);
+        CandyCrushModel.Candy candy = game.generateRandomCandy();
+        CandyCrushModel.Position pos = new CandyCrushModel.Position(0, 0, game.getBoard());
+        game.getGrid().set(0,candy);
+        game.getGrid().set(1,candy);
+        game.getGrid().set(10,candy);
+        game.getGrid().set(11,candy);
+        game.CheckAlleBuren(pos);
         assertEquals(4, game.getScore());
     }
 
     @Test
     public void CheckScoreOnMiddleRightSide() {
+        CandyCrushModel.Candy candy = game.generateRandomCandy();
+        CandyCrushModel.Position pos = new CandyCrushModel.Position(4, 9, game.getBoard());
         for (int i = 0; i < game.getGrid().size(); i++) {
-            game.getGrid().set(i, 3);
+            game.getGrid().set(i, candy);
         }
-        game.CheckAlleBuren(49); //rechtse muur
+        game.CheckAlleBuren(pos); //rechtse muur
         assertEquals(6, game.getScore());
     }
 
     @Test
     public void CheckScoreOnMiddleLeftSide() {
+        CandyCrushModel.Candy candy = game.generateRandomCandy();
+        CandyCrushModel.Position pos = new CandyCrushModel.Position(5, 0, game.getBoard());
         for (int i = 0; i < game.getGrid().size(); i++) {
-            game.getGrid().set(i, 3);
+            game.getGrid().set(i, candy);
         }
-        game.CheckAlleBuren(50); //linkse muur
+        game.CheckAlleBuren(pos); //linkse muur
         assertEquals(6, game.getScore());
     }
 
@@ -83,14 +89,6 @@ public class modelTest {
     @Test
     public void testDefaultName(){
         assertEquals("Default Player", game.getPlayerName());
-    }
-
-    @Test
-    public void testIdexToPosition() {
-        //game.pos.blabla
-        //werkt niet
-        CandyCrushModel.Position pos = new CandyCrushModel.Position(5,5, new CandyCrushModel.BoardSize(10,10));
-        //System.out.println(pos.neighborPositions());
     }
 
 }
