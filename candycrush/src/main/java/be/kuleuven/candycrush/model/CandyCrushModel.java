@@ -1,9 +1,5 @@
 package be.kuleuven.candycrush.model;
 
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
@@ -15,16 +11,18 @@ public class CandyCrushModel {
 
     private String playerName;
 
-    private ArrayList<Candy> grid;
+    //private ArrayList<Candy> grid;
+    private Board<Candy> grid;
 
-    private BoardSize board;
+    private BoardSize size;
 
     public CandyCrushModel(int veldBreedte, int veldHooghte) {
         playerName = "Default Player";
         this.circleRadius = 30;
         this.score = 0;
-        board = new BoardSize(veldBreedte, veldHooghte);
-        this.grid = new ArrayList<Candy>();
+        size = new BoardSize(veldBreedte, veldHooghte);
+        //this.grid = new ArrayList<Candy>();
+        this.grid = new Board<>(size);
         generateGrid();
     }
 
@@ -40,6 +38,10 @@ public class CandyCrushModel {
                 posities.add(Position.fromIndex(i, this));
             }
             return posities;
+        }
+
+        public int boardSize(){
+            return breedte * hoogte;
         }
     }
 
@@ -123,9 +125,10 @@ public class CandyCrushModel {
     }
 
     public void generateGrid(){
-        grid.clear();
-        for (int i = 0; i < board.breedte()*board.hoogte(); i++) {
-            grid.add(generateRandomCandy());
+        //grid.clear();
+        for (int i = 0; i < size.breedte()* size.hoogte(); i++) {
+            //grid.add(generateRandomCandy());
+            grid.replaceCellAt(Position.fromIndex(i, size), generateRandomCandy());
         }
     }
 
@@ -138,7 +141,7 @@ public class CandyCrushModel {
 
         System.out.println("row: " + row + " col: " + col);
         //position van index ophalen
-        CheckAlleBuren(new Position(row, col, board));
+        CheckAlleBuren(new Position(row, col, size));
     }
 
     public void CheckAlleBuren(Position coords){
@@ -157,10 +160,12 @@ public class CandyCrushModel {
 
         if(count >= 3) {
             addScore(count);
-            grid.set(coords.toIndex(), generateRandomCandy());
+            //grid.set(coords.toIndex(), generateRandomCandy());
+            grid.replaceCellAt(coords, generateRandomCandy());
             while (iterator.hasNext()) {
                 Position posBuur = (Position) iterator.next();
-                grid.set(posBuur.toIndex(), generateRandomCandy());
+                //grid.set(posBuur.toIndex(), generateRandomCandy());
+                grid.replaceCellAt(posBuur, generateRandomCandy());
             }
         }
     }
@@ -172,7 +177,8 @@ public class CandyCrushModel {
         ArrayList<Position> buren = new ArrayList<>();
         for(Position p : position.neighborPositions()){
             //check if the cany is the same
-            if(grid.get(p.toIndex()).equals(grid.get(position.toIndex()))){
+            //if(grid.get(p.toIndex()).equals(grid.get(position.toIndex()))){
+            if(grid.getCellAt(p).equals(grid.getCellAt(position))){
                 buren.add(p);
             }
         }
@@ -189,11 +195,11 @@ public class CandyCrushModel {
         generateGrid();
     }
 
-    public BoardSize getBoard() {
-        return board;
+    public BoardSize getSize() {
+        return size;
     }
 
-    public ArrayList<Candy> getGrid() {
+    public Board<Candy> getGrid() {
         return grid;
     }
 

@@ -9,8 +9,6 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.Shape;
-import javafx.scene.text.Text;
 
 import static be.kuleuven.candycrush.model.CandyCrushModel.Position.fromIndex;
 
@@ -79,10 +77,10 @@ public class CandyCrushView extends Region {
         //double circleWidth = game.getCircleRadius();//(speelveld.getPrefWidth() / game.getVeldBreedte()); //57
         //double circleHeight = (speelveld.getPrefHeight() / game.getVeldHooghte()); //40
         //int b = game.getBoard().breedte();
-        for (int i = 0; i < game.getGrid().size(); i++) {
+        for (int i = 0; i < game.getGrid().getSize().boardSize(); i++) {
 
-            CandyCrushModel.Position pos = fromIndex(i, game.getBoard());
-            Node candy = makeCandyShape(pos,game.getGrid().get(i));
+            CandyCrushModel.Position pos = fromIndex(i, game.getSize());
+            Node candy = makeCandyShape(pos,game.getGrid().getCellAt(pos));
             //System.out.println("X: " + candy.getBoundsInParent().getMinX() + " Y: " + candy.getBoundsInParent().getMinY());
 
             candy.setOnMouseClicked(e -> onCircleClick(e));
