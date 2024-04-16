@@ -11,19 +11,21 @@ public class BoardTest {
     public void fillboard(){
         Board<NormalCandy> board = new Board<>(new BoardSize(10, 10));
         board.fill(position -> new NormalCandy(1));
-        for (NormalCandy candy : board.getCells()) {
+        for (NormalCandy candy : board.getCells().values()) {
             assertEquals(1, candy.color());
         }
     }
 
     @Test
     public void copyTo(){
-        Board<NormalCandy> board = new Board<>(new BoardSize(10, 10));
+        BoardSize size = new BoardSize(10, 10);
+        Board<NormalCandy> board = new Board<>(size);
         board.fill(position -> new NormalCandy(1));
-        Board<NormalCandy> otherBoard = new Board<>(new BoardSize(10, 10));
+        Board<NormalCandy> otherBoard = new Board<>(size);
         board.copyTo(otherBoard);
         for (int i = 0; i < board.getCells().size(); i++) {
-            assertEquals(board.getCells().get(i).color(), otherBoard.getCells().get(i).color());
+            Position pos = Position.fromIndex(i, size);
+            assertEquals(board.getCells().get(pos).color(), otherBoard.getCells().get(pos).color());
         }
     }
 }

@@ -3,29 +3,28 @@ package be.kuleuven.candycrush.model;
 import be.kuleuven.candycrush.model.CandyCrushModel.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 
-//geeft een generisch type mee aan de klasse
 public class Board<T> {
     private final BoardSize size;
-    private final ArrayList<T> cells;
+    private Map<Position, T> cells;
+    private Map<Position, T> reverseCells;
 
     public Board(BoardSize size) {
         this.size = size;
-        cells = new ArrayList<>();
-        //empty the lijst
-        for(int i = 0; i < size.breedte() * size.hoogte(); i++) {
-            cells.add(null);
-        }
+        this.cells = new HashMap<>();
+        this.reverseCells = new HashMap<>();
     }
 
     public T getCellAt(Position position) {
-        return cells.get(position.toIndex());
+        return cells.get(position);
     }
 
     public void replaceCellAt(Position position, T newCell) {
-        cells.set(position.toIndex(), newCell);
+        cells.put(position, newCell);
     }
 
     public void fill(Function<Position, T> cellCreator) {
@@ -43,7 +42,7 @@ public class Board<T> {
             throw new IllegalArgumentException("Het bord is niet van dezelfde grootte");
         }else{
             otherBoard.cells.clear();
-            otherBoard.cells.addAll(cells);
+            otherBoard.cells.putAll(cells);
         }
     }
 
@@ -51,7 +50,7 @@ public class Board<T> {
         return size;
     }
 
-    public ArrayList<T> getCells() {
-        return cells;
+    public Map<Position, T> getCells() {
+        return new HashMap<>(cells);
     }
 }
