@@ -2,16 +2,14 @@ package be.kuleuven.candycrush.model;
 
 import be.kuleuven.candycrush.model.CandyCrushModel.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 
 public class Board<T> {
     private final BoardSize size;
-    private Map<Position, T> cells;
-    private Map<Position, T> reverseCells;
+    private final Map<Position, T> cells;
+    private final Map<T, Set<Position>> reverseCells;
 
     public Board(BoardSize size) {
         this.size = size;
@@ -24,7 +22,16 @@ public class Board<T> {
     }
 
     public void replaceCellAt(Position position, T newCell) {
-        cells.put(position, newCell);
+        T oldCell = cells.put(position, newCell);
+
+        if (oldCell != null) {
+            Set<Position> positions = reverseCells.get(oldCell);
+            positions.remove(position);
+            if (positions.isEmpty()) {
+                reverseCells.remove(oldCell);
+            }
+        }
+        reverseCells.computeIfAbsent(newCell, k -> new HashSet<>()).add(position);
     }
 
     public void fill(Function<Position, T> cellCreator) {
@@ -43,7 +50,14 @@ public class Board<T> {
         }else{
             otherBoard.cells.clear();
             otherBoard.cells.putAll(cells);
+            otherBoard.reverseCells.clear();
+            otherBoard.reverseCells.putAll(reverseCells);
         }
+    }
+
+    public List<Position> getPositionsOfElement(T candy) {
+        Set<Position> positionsSet = reverseCells.getOrDefault(candy, Collections.emptySet());
+        return Collections.unmodifiableList(new ArrayList<>(positionsSet));
     }
 
     public BoardSize getSize() {

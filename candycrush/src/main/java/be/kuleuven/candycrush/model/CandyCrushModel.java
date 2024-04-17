@@ -125,9 +125,7 @@ public class CandyCrushModel {
     }
 
     public void generateGrid(){
-        //grid.clear();
         for (int i = 0; i < size.breedte()* size.hoogte(); i++) {
-            //grid.add(generateRandomCandy());
             grid.replaceCellAt(Position.fromIndex(i, size), generateRandomCandy());
         }
     }
@@ -160,11 +158,9 @@ public class CandyCrushModel {
 
         if(count >= 3) {
             addScore(count);
-            //grid.set(coords.toIndex(), generateRandomCandy());
             grid.replaceCellAt(coords, generateRandomCandy());
             while (iterator.hasNext()) {
                 Position posBuur = (Position) iterator.next();
-                //grid.set(posBuur.toIndex(), generateRandomCandy());
                 grid.replaceCellAt(posBuur, generateRandomCandy());
             }
         }
@@ -177,7 +173,6 @@ public class CandyCrushModel {
         ArrayList<Position> buren = new ArrayList<>();
         for(Position p : position.neighborPositions()){
             //check if the cany is the same
-            //if(grid.get(p.toIndex()).equals(grid.get(position.toIndex()))){
             if(grid.getCellAt(p).equals(grid.getCellAt(position))){
                 buren.add(p);
             }
