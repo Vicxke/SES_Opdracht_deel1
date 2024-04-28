@@ -1,8 +1,13 @@
 package be.kuleuven.candycrush.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import java.util.*;
 
 
 public class CandyCrushModel {
@@ -32,8 +37,8 @@ public class CandyCrushModel {
             if (hoogte <= 0) throw new IllegalArgumentException("hoogte must be non-negative");
         }
 
-        public Iterable<Position> positions(){
-            ArrayList<Position> posities = new ArrayList<>();
+        public Collection<Position> positions(){
+            Collection<Position> posities = new ArrayList<>();
             for (int i = 0; i < breedte * hoogte; i++) {
                 posities.add(Position.fromIndex(i, this));
             }
@@ -86,6 +91,19 @@ public class CandyCrushModel {
             return buren;
         }
 
+        public Stream<Position> walkLeft(){
+            return Stream.iterate(this, p -> new Position(p.row, p.col-1, bord)).limit(this.col);
+        }
+        public Stream<Position> walkRight(){
+            return Stream.iterate(this, p -> new Position(p.row, p.col+1, bord)).limit(this.col);
+        }
+        public Stream<Position> walkUp(){
+            return Stream.iterate(this, p -> new Position(p.row-1, p.col, bord)).limit(this.row);
+        }
+        public Stream<Position> walkDown(){
+            return Stream.iterate(this, p -> new Position(p.row+1, p.col, bord)).limit(this.row);
+        }
+
         public boolean isLastColumn(){
             //die aangeeft of de positie de laatste is in een rij.
             return this.col == bord.breedte() - 1;
@@ -125,8 +143,8 @@ public class CandyCrushModel {
     }
 
     public void generateGrid(){
-        for (int i = 0; i < size.breedte()* size.hoogte(); i++) {
-            grid.replaceCellAt(Position.fromIndex(i, size), generateRandomCandy());
+        for (Position pos : size.positions()) {
+            grid.replaceCellAt(pos, generateRandomCandy());
         }
     }
 
@@ -178,6 +196,45 @@ public class CandyCrushModel {
             }
         }
         return buren;
+    }
+
+    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
+        positions = positions.limit(2);
+        return positions.allMatch(pos -> grid.getCellAt(pos).equals(candy));
+    }
+
+    public Stream<Position> horizontalStartingPositions() {
+        return size.positions().stream().filter(pos -> !pos.isLastColumn() && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkRight()));
+    }
+
+    public Stream<Position> verticalStartingPositions() {
+        return size.positions().stream().filter(pos -> !pos.isLastColumn() && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkDown()));
+    }
+
+    public List<Position> longestMatchToRight(Position pos) {
+        Candy candy = grid.getCellAt(pos);
+        return pos.walkRight().takeWhile(p -> grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+    }
+
+    public List<Position> longestMatchDown(Position pos) {
+        Candy candy = grid.getCellAt(pos);
+        return pos.walkDown().takeWhile(p -> grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+    }
+
+    public Set<List<Position>> findAllMatches() {
+        Set<List<Position>> matches = new HashSet<>();
+        Stream.concat(horizontalStartingPositions(), verticalStartingPositions())
+                .forEach(pos -> {
+                    List<Position> matchRight = longestMatchToRight(pos);
+                    if (matchRight.size() >= 3) {
+                        matches.add(matchRight);
+                    }
+                    List<Position> matchDown = longestMatchDown(pos);
+                    if (matchDown.size() >= 3) {
+                        matches.add(matchDown);
+                    }
+                });
+        return matches;
     }
 
 

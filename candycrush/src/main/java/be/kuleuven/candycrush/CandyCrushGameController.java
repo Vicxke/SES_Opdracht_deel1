@@ -43,6 +43,7 @@ public class CandyCrushGameController {
     public void resetGame(){
         game.resetGame();
         view.update();
+        System.out.println(game.findAllMatches());
     }
 
     public void setNaamSpeler(String naamSpeler) {

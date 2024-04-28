@@ -92,5 +92,4 @@ public class modelTest {
     public void testDefaultName(){
         assertEquals("Default Player", game.getPlayerName());
     }
-
 }
