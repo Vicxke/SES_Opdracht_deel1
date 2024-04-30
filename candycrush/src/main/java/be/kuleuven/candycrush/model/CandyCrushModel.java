@@ -91,17 +91,20 @@ public class CandyCrushModel {
             return buren;
         }
 
-        public Stream<Position> walkLeft(){
-            return Stream.iterate(this, p -> new Position(p.row, p.col-1, bord)).limit(this.col);
+        public Stream<Position> walkLeft() {
+            return Stream.iterate(this, pos -> new Position(pos.row, pos.col - 1, pos.bord)).takeWhile(pos -> pos.col - 1 >= 0);
         }
-        public Stream<Position> walkRight(){
-            return Stream.iterate(this, p -> new Position(p.row, p.col+1, bord)).limit(this.col);
+
+        public Stream<Position> walkRight() {
+            return Stream.iterate(this, p -> new Position(p.row, p.col + 1, p.bord)).takeWhile(pos -> pos.col + 1  < pos.bord.breedte());
         }
-        public Stream<Position> walkUp(){
-            return Stream.iterate(this, p -> new Position(p.row-1, p.col, bord)).limit(this.row);
+
+        public Stream<Position> walkUp() {
+            return Stream.iterate(this, p -> new Position(p.row - 1, p.col, p.bord)).takeWhile(pos -> pos.row - 1 >= 0);
         }
-        public Stream<Position> walkDown(){
-            return Stream.iterate(this, p -> new Position(p.row+1, p.col, bord)).limit(this.row);
+
+        public Stream<Position> walkDown() {
+            return Stream.iterate(this, p -> new Position(p.row + 1, p.col, p.bord)).takeWhile(pos -> pos.row + 1 < pos.bord.hoogte());
         }
 
         public boolean isLastColumn(){
@@ -199,16 +202,22 @@ public class CandyCrushModel {
     }
 
     public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
-        positions = positions.limit(2);
-        return positions.allMatch(pos -> grid.getCellAt(pos).equals(candy));
+        //neemt de eerste 2 elementen van de lijst
+        List<Position> positionList = positions.limit(2).toList();
+        if(positionList.size() < 2) return false;
+
+        //geeft alle matches terug met die candy
+        return positionList.stream().allMatch(pos -> grid.getCellAt(pos).equals(candy));
     }
 
+
+    //geen idee of dit een probleem is maar momenteel als je een lengte langer als 2 hebt dan heb je meerdere posities voor dezelfde candy groep
     public Stream<Position> horizontalStartingPositions() {
-        return size.positions().stream().filter(pos -> !pos.isLastColumn() && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkRight()));
+        return size.positions().stream().filter(pos -> !pos.isLastColumn() && pos.col > 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkLeft()));
     }
 
     public Stream<Position> verticalStartingPositions() {
-        return size.positions().stream().filter(pos -> !pos.isLastColumn() && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkDown()));
+        return size.positions().stream().filter(pos -> pos.row < pos.bord.hoogte && pos.row > 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkUp()));
     }
 
     public List<Position> longestMatchToRight(Position pos) {
@@ -224,16 +233,16 @@ public class CandyCrushModel {
     public Set<List<Position>> findAllMatches() {
         Set<List<Position>> matches = new HashSet<>();
         Stream.concat(horizontalStartingPositions(), verticalStartingPositions())
-                .forEach(pos -> {
-                    List<Position> matchRight = longestMatchToRight(pos);
-                    if (matchRight.size() >= 3) {
-                        matches.add(matchRight);
-                    }
-                    List<Position> matchDown = longestMatchDown(pos);
-                    if (matchDown.size() >= 3) {
-                        matches.add(matchDown);
-                    }
-                });
+            .forEach(pos -> {
+                List<Position> matchRight = longestMatchToRight(pos);
+                if (matchRight.size() >= 3) {
+                    matches.add(matchRight);
+                }
+                List<Position> matchDown = longestMatchDown(pos);
+                if (matchDown.size() >= 3) {
+                    matches.add(matchDown);
+                }
+            });
         return matches;
     }
 

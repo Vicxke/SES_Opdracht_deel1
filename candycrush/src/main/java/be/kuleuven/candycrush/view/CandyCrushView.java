@@ -10,6 +10,8 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
+import java.util.List;
+
 import static be.kuleuven.candycrush.model.CandyCrushModel.Position.fromIndex;
 
 public class CandyCrushView extends Region {
@@ -86,6 +88,15 @@ public class CandyCrushView extends Region {
             candy.setOnMouseClicked(e -> onCircleClick(e));
 
             speelVeld.getChildren().add(candy);
+        }
+
+        //teken een kleine zwarte cirkel op een match van de game.allMatches()
+        for(List<CandyCrushModel.Position> match : game.findAllMatches()){
+            for(CandyCrushModel.Position pos : match) {
+                Circle circle = new Circle(pos.col() * game.getCircleRadius() + game.getCircleRadius() / 2, pos.row() * game.getCircleRadius() + game.getCircleRadius() / 2, game.getCircleRadius() / 4);
+                circle.setFill(Color.BLACK);
+                speelVeld.getChildren().add(circle);
+            }
         }
     }
 
