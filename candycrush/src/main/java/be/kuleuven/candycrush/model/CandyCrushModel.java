@@ -162,6 +162,7 @@ public class CandyCrushModel {
         System.out.println("row: " + row + " col: " + col);
         //position van index ophalen
         CheckAlleBuren(new Position(row, col, size));
+        updateBoard();
     }
 
     public void CheckAlleBuren(Position coords){
@@ -195,7 +196,7 @@ public class CandyCrushModel {
         ArrayList<Position> buren = new ArrayList<>();
         for(Position p : position.neighborPositions()){
             //check if the cany is the same
-            if(grid.getCellAt(p).equals(grid.getCellAt(position))){
+            if(grid.getCellAt(p) != null && grid.getCellAt(position) != null && grid.getCellAt(p).equals(grid.getCellAt(position))){
                 buren.add(p);
             }
         }
@@ -209,10 +210,7 @@ public class CandyCrushModel {
         if(positionList.size() < 2) return false;
 
         //geeft alle matches terug met die candy
-        return positionList.stream().allMatch(pos -> {
-            Candy cellCandy = grid.getCellAt(pos);
-            return cellCandy != null && cellCandy.equals(candy);
-        });
+        return positionList.stream().allMatch(pos -> grid.getCellAt(pos) != null && grid.getCellAt(pos).equals(candy));
     }
 
 
@@ -227,12 +225,12 @@ public class CandyCrushModel {
 
     public List<Position> longestMatchToRight(Position pos) {
         Candy candy = grid.getCellAt(pos);
-        return pos.walkRight().takeWhile(p -> grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+        return pos.walkRight().takeWhile(p -> grid.getCellAt(p) != null && grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
     }
 
     public List<Position> longestMatchDown(Position pos) {
         Candy candy = grid.getCellAt(pos);
-        return pos.walkDown().takeWhile(p -> grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+        return pos.walkDown().takeWhile(p -> grid.getCellAt(p) != null && grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
     }
 
     public Set<List<Position>> findAllMatches() {
@@ -274,16 +272,13 @@ public class CandyCrushModel {
         }
         Position bovenPos = new Position(pos.row() - 1, pos.col(), pos.bord());
 
-        System.out.println(pos);
-        System.out.println(grid.getCellAt(pos));
         //pos 1 null
         if(grid.getCellAt(pos) == null){
-            System.out.println(grid.getCellAt(pos));
+            //System.out.println(grid.getCellAt(pos));
             //positie erboven is null
             if (grid.getCellAt(bovenPos) == null) {
                 fallDownTo(bovenPos);
             }
-
             //nog eens dubbel checken of deze null is wanneer je bv op het eind zit van een lijst
             //anders kom je volgens mij in een ondeindige loop terecht waarbij je de hele tijd fallDownTO oproept omdat je de hele
             //tijd Null in een positie zet zoals in een voorbeeld waarbij je 0011 hebt
