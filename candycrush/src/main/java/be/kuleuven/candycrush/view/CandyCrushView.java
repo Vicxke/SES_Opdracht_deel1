@@ -60,6 +60,9 @@ public class CandyCrushView extends Region {
                 rectangle.setFill(Color.LIME);
                 yield rectangle;
             }
+            case null -> {
+                yield null;
+            }
         };
     }
 
@@ -85,14 +88,16 @@ public class CandyCrushView extends Region {
             Node candy = makeCandyShape(pos,game.getGrid().getCellAt(pos));
             //System.out.println("X: " + candy.getBoundsInParent().getMinX() + " Y: " + candy.getBoundsInParent().getMinY());
 
-            candy.setOnMouseClicked(e -> onCircleClick(e));
+            if(candy != null){
+                candy.setOnMouseClicked(e -> onCircleClick(e));
+                speelVeld.getChildren().add(candy);
+            }
 
-            speelVeld.getChildren().add(candy);
         }
 
         //debug code
         //teken een kleine zwarte cirkel op een match van de game.allMatches()
-        /*
+
         for(List<CandyCrushModel.Position> match : game.findAllMatches()){
             for(CandyCrushModel.Position pos : match) {
                 Circle circle = new Circle(pos.col() * game.getCircleRadius() + game.getCircleRadius() / 2, pos.row() * game.getCircleRadius() + game.getCircleRadius() / 2, game.getCircleRadius() / 3);

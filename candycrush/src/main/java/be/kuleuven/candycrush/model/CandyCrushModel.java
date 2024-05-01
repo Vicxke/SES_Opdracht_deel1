@@ -28,7 +28,8 @@ public class CandyCrushModel {
         size = new BoardSize(veldBreedte, veldHooghte);
         //this.grid = new ArrayList<Candy>();
         this.grid = new Board<>(size);
-        generateGrid();
+        //generateGrid();
+        resetGame();
     }
 
     public record BoardSize(int breedte, int hoogte){
@@ -201,13 +202,17 @@ public class CandyCrushModel {
         return buren;
     }
 
+    //opdracht 12 functies
     public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
         //neemt de eerste 2 elementen van de lijst
         List<Position> positionList = positions.limit(2).toList();
         if(positionList.size() < 2) return false;
 
         //geeft alle matches terug met die candy
-        return positionList.stream().allMatch(pos -> grid.getCellAt(pos).equals(candy));
+        return positionList.stream().allMatch(pos -> {
+            Candy cellCandy = grid.getCellAt(pos);
+            return cellCandy != null && cellCandy.equals(candy);
+        });
     }
 
 
@@ -246,6 +251,67 @@ public class CandyCrushModel {
         return matches;
     }
 
+    //opdracht 13 functies
+
+    public void clearMatch(List<Position> match){
+        if (match.isEmpty()) {
+            return;
+        }
+        Position pos = match.get(0);
+        grid.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
+
+        //ik denk dat dit hier wel mag
+        fallDownTo(pos); // Laat snoepjes vallen
+
+        match.remove(0); // Verwijder het eerste element uit de lijst
+        clearMatch(match); // Roep de methode opnieuw aan met de bijgewerkte lijst
+    }
+
+    public void fallDownTo(Position pos){
+
+        if (pos.row() == 0) {
+            return;
+        }
+        Position bovenPos = new Position(pos.row() - 1, pos.col(), pos.bord());
+
+        System.out.println(pos);
+        System.out.println(grid.getCellAt(pos));
+        //pos 1 null
+        if(grid.getCellAt(pos) == null){
+            System.out.println(grid.getCellAt(pos));
+            //positie erboven is null
+            if (grid.getCellAt(bovenPos) == null) {
+                fallDownTo(bovenPos);
+            }
+
+            //nog eens dubbel checken of deze null is wanneer je bv op het eind zit van een lijst
+            //anders kom je volgens mij in een ondeindige loop terecht waarbij je de hele tijd fallDownTO oproept omdat je de hele
+            //tijd Null in een positie zet zoals in een voorbeeld waarbij je 0011 hebt
+            //hierbij zou deze tussen de 2 switchen
+            if(grid.getCellAt(bovenPos) != null){
+                grid.replaceCellAt(pos, grid.getCellAt(bovenPos));
+                grid.replaceCellAt(bovenPos, null);
+                fallDownTo(bovenPos);
+            }
+        }else{
+            fallDownTo(bovenPos);
+        }
+    }
+
+    //problemen met het feit dat snoepjes null kunnen zijn
+    public boolean updateBoard(){
+        Set<List<Position>> matches = findAllMatches();
+        if (matches.isEmpty()) {
+            return false;
+        }
+
+        List<Position> match = matches.iterator().next();
+        clearMatch(match);
+        updateBoard();
+        return true;
+    }
+
+
 
     public void addScore(int waarde){
         score+= waarde;
@@ -254,6 +320,7 @@ public class CandyCrushModel {
     public void resetGame(){
         score = 0;
         generateGrid();
+        updateBoard();
     }
 
     public BoardSize getSize() {
