@@ -92,19 +92,19 @@ public class CandyCrushModel {
         }
 
         public Stream<Position> walkLeft() {
-            return Stream.iterate(this, pos -> new Position(pos.row, pos.col - 1, pos.bord)).takeWhile(pos -> pos.col - 1 >= 0);
+            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col <= this.col);
         }
 
         public Stream<Position> walkRight() {
-            return Stream.iterate(this, p -> new Position(p.row, p.col + 1, p.bord)).takeWhile(pos -> pos.col + 1  < pos.bord.breedte());
+            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col >= this.col);
         }
 
         public Stream<Position> walkUp() {
-            return Stream.iterate(this, p -> new Position(p.row - 1, p.col, p.bord)).takeWhile(pos -> pos.row - 1 >= 0);
+            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row <= this.row);
         }
 
         public Stream<Position> walkDown() {
-            return Stream.iterate(this, p -> new Position(p.row + 1, p.col, p.bord)).takeWhile(pos -> pos.row + 1 < pos.bord.hoogte());
+            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row >= this.row);
         }
 
         public boolean isLastColumn(){
@@ -213,11 +213,11 @@ public class CandyCrushModel {
 
     //geen idee of dit een probleem is maar momenteel als je een lengte langer als 2 hebt dan heb je meerdere posities voor dezelfde candy groep
     public Stream<Position> horizontalStartingPositions() {
-        return size.positions().stream().filter(pos -> !pos.isLastColumn() && pos.col > 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkLeft()));
+        return size.positions().stream().filter(pos -> !pos.isLastColumn() && pos.col >= 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkRight()));
     }
 
     public Stream<Position> verticalStartingPositions() {
-        return size.positions().stream().filter(pos -> pos.row < pos.bord.hoogte && pos.row > 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkUp()));
+        return size.positions().stream().filter(pos -> pos.row < pos.bord.hoogte && pos.row >= 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkDown()));
     }
 
     public List<Position> longestMatchToRight(Position pos) {
