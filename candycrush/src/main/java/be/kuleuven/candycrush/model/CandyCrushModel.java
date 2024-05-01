@@ -292,8 +292,7 @@ public class CandyCrushModel {
             fallDownTo(bovenPos);
         }
     }
-
-    //problemen met het feit dat snoepjes null kunnen zijn
+    
     public boolean updateBoard(){
         Set<List<Position>> matches = findAllMatches();
         if (matches.isEmpty()) {
