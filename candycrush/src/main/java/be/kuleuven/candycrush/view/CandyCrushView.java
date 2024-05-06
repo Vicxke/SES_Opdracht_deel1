@@ -98,6 +98,7 @@ public class CandyCrushView extends Region {
         //debug code
         //teken een kleine zwarte cirkel op een match van de game.allMatches()
 
+/*
         for(List<CandyCrushModel.Position> match : game.findAllMatches()){
             for(CandyCrushModel.Position pos : match) {
                 Circle circle = new Circle(pos.col() * game.getCircleRadius() + game.getCircleRadius() / 2, pos.row() * game.getCircleRadius() + game.getCircleRadius() / 2, game.getCircleRadius() / 3);
@@ -105,7 +106,7 @@ public class CandyCrushView extends Region {
                 speelVeld.getChildren().add(circle);
             }
         }
-        /*
+
         for (CandyCrushModel.Position pos : game.horizontalStartingPositions().toList()) {
             Circle circle = new Circle(pos.col() * game.getCircleRadius() + game.getCircleRadius() / 2, pos.row() * game.getCircleRadius() + game.getCircleRadius() / 2, game.getCircleRadius() / 4);
             circle.setFill(Color.SILVER);

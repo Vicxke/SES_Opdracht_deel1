@@ -1,5 +1,7 @@
 package be.kuleuven.candycrush.model;
 
+import javafx.geometry.Pos;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -20,6 +22,9 @@ public class CandyCrushModel {
     private Board<Candy> grid;
 
     private BoardSize size;
+
+    private Position previousClicked;
+
 
     public CandyCrushModel(int veldBreedte, int veldHooghte) {
         playerName = "Default Player";
@@ -93,19 +98,19 @@ public class CandyCrushModel {
         }
 
         public Stream<Position> walkLeft() {
-            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col <= this.col);
+            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col <= this.col).sorted(Comparator.comparingInt(Position::col).reversed());
         }
 
         public Stream<Position> walkRight() {
-            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col >= this.col);
+            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col >= this.col).sorted(Comparator.comparingInt(Position::col));
         }
 
         public Stream<Position> walkUp() {
-            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row <= this.row);
+            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row <= this.row).sorted(Comparator.comparingInt(Position::row).reversed());
         }
 
         public Stream<Position> walkDown() {
-            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row >= this.row);
+            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row >= this.row).sorted(Comparator.comparingInt(Position::row));
         }
 
         public boolean isLastColumn(){
@@ -161,10 +166,22 @@ public class CandyCrushModel {
 
         System.out.println("row: " + row + " col: " + col);
         //position van index ophalen
-        CheckAlleBuren(new Position(row, col, size));
-        updateBoard();
+        //CheckAlleBuren(new Position(row, col, size));
+        Position pos = new Position(row, col, size);
+        if(previousClicked == null){
+            previousClicked = pos;
+        }
+
+        if(!pos.equals(previousClicked)){
+            //swap these positions
+            doSwap(previousClicked, pos);
+            updateBoard();
+            previousClicked = null;
+        }
     }
 
+
+    /*
     public void CheckAlleBuren(Position coords){
 
         Iterable<Position> buren  = getSameNeighbourPositions(coords);
@@ -202,7 +219,7 @@ public class CandyCrushModel {
         }
         return buren;
     }
-
+    */
     //opdracht 12 functies
     public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
         //neemt de eerste 2 elementen van de lijst
@@ -210,17 +227,18 @@ public class CandyCrushModel {
         if(positionList.size() < 2) return false;
 
         //geeft alle matches terug met die candy
-        return positionList.stream().allMatch(pos -> grid.getCellAt(pos) != null && grid.getCellAt(pos).equals(candy));
+        return positionList.stream()
+                .allMatch(pos -> grid.getCellAt(pos) != null && grid.getCellAt(pos).equals(candy));
     }
 
 
     //geen idee of dit een probleem is maar momenteel als je een lengte langer als 2 hebt dan heb je meerdere posities voor dezelfde candy groep
     public Stream<Position> horizontalStartingPositions() {
-        return size.positions().stream().filter(pos -> !pos.isLastColumn() && pos.col >= 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkRight()));
+        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(grid.getCellAt(pos), pos.walkLeft())).filter(pos -> grid.getCellAt(pos) != null);
     }
 
     public Stream<Position> verticalStartingPositions() {
-        return size.positions().stream().filter(pos -> pos.row < pos.bord.hoogte && pos.row >= 0 && firstTwoHaveCandy(grid.getCellAt(pos), pos.walkDown()));
+        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(grid.getCellAt(pos), pos.walkUp())).filter(pos -> grid.getCellAt(pos) != null);
     }
 
     public List<Position> longestMatchToRight(Position pos) {
@@ -246,7 +264,11 @@ public class CandyCrushModel {
                     matches.add(matchDown);
                 }
             });
-        return matches;
+
+        //sorteer zodat de langste match als eerste staat
+        return matches.stream().filter(match -> matches.stream()
+                        .noneMatch(longerMatch -> longerMatch.size() > match.size() && longerMatch.containsAll(match)))
+                .collect(Collectors.toSet());
     }
 
     //opdracht 13 functies
@@ -255,6 +277,7 @@ public class CandyCrushModel {
         if (match.isEmpty()) {
             return;
         }
+        score++;
         Position pos = match.get(0);
         grid.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
 
@@ -292,7 +315,7 @@ public class CandyCrushModel {
             fallDownTo(bovenPos);
         }
     }
-    
+
     public boolean updateBoard(){
         Set<List<Position>> matches = findAllMatches();
         if (matches.isEmpty()) {
@@ -305,7 +328,92 @@ public class CandyCrushModel {
         return true;
     }
 
+    /*
 
+    //eerst proberen de beste optie te vinden voor dat deze na een actie terug kijkt
+    //dus gewoon het bord bekijken zoals het is en alle swaps uitbroperen.
+    public void maximumScore(int score, int swaps, Board<Candy> bord){
+
+        for (Position pos : size.positions()) {
+            for(Position p : pos.neighborPositions()){
+                doSwap(pos, p);
+                if(matchAfterSwitch()){
+                    //score is gelijk aan het aantal snoepjes in de matches
+                    score+=findAllMatches().stream().mapToInt(List::size).sum();
+                    swaps++;
+
+
+                    //als er een match is dan moet je kijken of je nog een match kan maken
+                    maximumScore(score, swaps, bord);
+                }else{
+                    undoSwap(pos, p);
+                }
+            }
+        }
+
+    }*/
+
+    public void maxScore() {
+        grid.setMaxScore(0);
+        List<Swap> bestSequence = grid.getBestSequence();
+        maximizeScore(new ArrayList<>(), 0);
+
+        System.out.println("Max score: " + grid.getMaxScore());
+        System.out.println("amount of moves: " + grid.getBestSequence().size());
+    }
+
+    private void maximizeScore(List<Swap> sequence, int score) {
+        if (score > grid.getMaxScore()) {
+            grid.setMaxScore(score);
+            grid.setBestSequence(new ArrayList<>(sequence));
+        }
+
+        for (Position pos : size.positions()) {
+            for (Position neighbor : pos.neighborPositions()) {
+                Swap swap = new Swap(pos, neighbor);
+                if (isValidSwap(swap)) {
+                    swap.swap(grid);
+                    int newScore = score + countMatches();
+                    sequence.add(swap);
+                    maximizeScore(sequence, newScore);
+                    sequence.remove(swap);
+                    swap.swap(grid);
+                }
+            }
+        }
+    }
+
+    private boolean isValidSwap(Swap swap) {
+        if(swap == null){
+            return false;
+        }
+        if(grid.getCellAt(swap.getPos1()) == null || grid.getCellAt(swap.getPos2()) == null){
+            return false;
+        }
+        return true;
+    }
+
+    private void doSwap(Position pos1, Position pos2) {
+        if(pos1 == null || pos2 == null){
+            return;
+        }
+        Candy temp = grid.getCellAt(pos1);
+        grid.replaceCellAt(pos1, grid.getCellAt(pos2));
+        grid.replaceCellAt(pos2, temp);
+    }
+
+
+    private int countMatches() {
+        return findAllMatches().stream().mapToInt(List::size).sum();
+    }
+
+    boolean matchAfterSwitch() {
+        Set<List<Position>> matches = findAllMatches();
+        if (matches.isEmpty()) {
+            return false;
+        }
+        return true;
+    }
 
     public void addScore(int waarde){
         score+= waarde;
