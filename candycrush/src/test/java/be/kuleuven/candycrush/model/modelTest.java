@@ -1,5 +1,7 @@
 package be.kuleuven.candycrush.model;
 
+import be.kuleuven.candycrush.model.candys.*;
+import be.kuleuven.candycrush.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +29,8 @@ public class modelTest {
 
     @Test
     public void checkRegenerateValueInRange() {
-        CandyCrushModel.Candy candy = game.generateRandomCandy();
-        CandyCrushModel.Position pos = new CandyCrushModel.Position(0, 5, game.getSize());
+        Candy candy = game.generateRandomCandy();
+        Position pos = new Position(0, 5, game.getSize());
         game.getGrid().replaceCellAt(pos, candy);
         assertTrue(candy.equals(game.getGrid().getCellAt(pos)));
     }
@@ -120,7 +122,7 @@ public class modelTest {
    @*@**@
    *#@##*""");
 
-        model1.maxScore();
+        //model1.maxScore();
         /*
         assertEquals(16, model1.getScore());
         assertEquals(4, model1.getGrid().getBestSequence().size());
@@ -138,23 +140,23 @@ public class modelTest {
 
     public static CandyCrushModel createBoardFromString(String configuration) {
         var lines = configuration.toLowerCase().lines().toList();
-        CandyCrushModel.BoardSize size = new CandyCrushModel.BoardSize(lines.size(), lines.getFirst().length());
+        BoardSize size = new BoardSize(lines.size(), lines.getFirst().length());
         var model = new CandyCrushModel(size.breedte(), size.hoogte());
         for (int row = 0; row < lines.size(); row++) {
             var line = lines.get(row);
             for (int col = 0; col < line.length(); col++) {
-                model.getGrid().replaceCellAt(new CandyCrushModel.Position(row, col, size), characterToCandy(line.charAt(col)));
+                model.getGrid().replaceCellAt(new Position(row, col, size), characterToCandy(line.charAt(col)));
             }
         }
         return model;
     }
 
-    private static CandyCrushModel.Candy characterToCandy(char c) {
+    private static Candy characterToCandy(char c) {
         return switch(c) {
             case 'o' -> null;
-            case '*' -> new CandyCrushModel.NormalCandy(1);
-            case '#' -> new CandyCrushModel.NormalCandy(2);
-            case '@' -> new CandyCrushModel.NormalCandy(3);
+            case '*' -> new NormalCandy(1);
+            case '#' -> new NormalCandy(2);
+            case '@' -> new NormalCandy(3);
             default -> throw new IllegalArgumentException("Unexpected value: " + c);
         };
     }

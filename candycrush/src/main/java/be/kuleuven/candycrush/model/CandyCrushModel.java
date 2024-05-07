@@ -1,10 +1,8 @@
 package be.kuleuven.candycrush.model;
 
-import javafx.geometry.Pos;
+import be.kuleuven.candycrush.model.candys.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,7 +16,6 @@ public class CandyCrushModel {
 
     private String playerName;
 
-    //private ArrayList<Candy> grid;
     private Board<Candy> grid;
 
     private BoardSize size;
@@ -36,103 +33,6 @@ public class CandyCrushModel {
         //generateGrid();
         resetGame();
     }
-
-    public record BoardSize(int breedte, int hoogte){
-        public BoardSize{
-            if (breedte <= 0) throw new IllegalArgumentException("breedte must be non-negative");
-            if (hoogte <= 0) throw new IllegalArgumentException("hoogte must be non-negative");
-        }
-
-        public Collection<Position> positions(){
-            Collection<Position> posities = new ArrayList<>();
-            for (int i = 0; i < breedte * hoogte; i++) {
-                posities.add(Position.fromIndex(i, this));
-            }
-            return posities;
-        }
-
-        public int boardSize(){
-            return breedte * hoogte;
-        }
-    }
-
-    public record Position(int row,int col, BoardSize bord){
-        public Position {
-            if(row < 0 || row >= bord.hoogte()){
-                throw new IllegalArgumentException("row is out of bounds");
-            }
-            if(col < 0 || col >= bord.breedte()){
-                throw new IllegalArgumentException("hoogte is out of bounds");
-            }
-        }
-        public int toIndex(){
-            return this.row * bord.breedte() + this.col;
-        }
-
-        public static Position fromIndex(int index, BoardSize size){
-            if(index > size.breedte() * size.hoogte() || index < 0){
-                throw new IllegalArgumentException("index bestaat niet");
-            }else{
-                int row = index / size.breedte();
-                int col = index % size.hoogte();
-                return new Position(row,col, size);
-            }
-        }
-
-        public Iterable<Position> neighborPositions(){
-            //alle bestaande buren ongeacht of ze dezelfde waarde hebben.
-            ArrayList<Position> buren = new ArrayList<>();
-            for (int i = -1; i <= 1; i++) {
-                for (int j = -1; j <= 1; j++) {
-                    if(i == 0 && j == 0){
-                        continue;
-                    }
-                    int newRow = this.row + i;
-                    int newCol = this.col + j;
-                    if(newRow >= 0 && newRow < bord.hoogte() && newCol >= 0 && newCol < bord.breedte()){
-                        buren.add(new Position(newRow, newCol, bord));
-                    }
-                }
-            }
-            return buren;
-        }
-
-        public Stream<Position> walkLeft() {
-            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col <= this.col).sorted(Comparator.comparingInt(Position::col).reversed());
-        }
-
-        public Stream<Position> walkRight() {
-            return this.bord.positions().stream().filter(pos -> pos.row == this.row && pos.col >= this.col).sorted(Comparator.comparingInt(Position::col));
-        }
-
-        public Stream<Position> walkUp() {
-            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row <= this.row).sorted(Comparator.comparingInt(Position::row).reversed());
-        }
-
-        public Stream<Position> walkDown() {
-            return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row >= this.row).sorted(Comparator.comparingInt(Position::row));
-        }
-
-        public boolean isLastColumn(){
-            //die aangeeft of de positie de laatste is in een rij.
-            return this.col == bord.breedte() - 1;
-        }
-    }
-
-    public sealed interface Candy permits NormalCandy, Stheefje, bolleke, petoterke, haaariebooo{}
-
-    //NormalCandy, met een attribuut color (een int met mogelijke waarden 0, 1, 2, of 3)
-    public record NormalCandy(int color) implements Candy{
-        public NormalCandy{
-            if(color < 0 || color > 3){
-                throw new IllegalArgumentException("color moet tussen 0 en 3 liggen");
-            }
-        }
-    }
-    public record Stheefje() implements Candy{}
-    public record bolleke() implements Candy{}
-    public record petoterke() implements Candy{}
-    public record haaariebooo() implements Candy{}
 
 
     public Candy generateRandomCandy(){
@@ -165,8 +65,6 @@ public class CandyCrushModel {
         int col = (int) Math.floor(xCoordInArray);
 
         System.out.println("row: " + row + " col: " + col);
-        //position van index ophalen
-        //CheckAlleBuren(new Position(row, col, size));
         Position pos = new Position(row, col, size);
         if(previousClicked == null){
             previousClicked = pos;
@@ -181,45 +79,6 @@ public class CandyCrushModel {
     }
 
 
-    /*
-    public void CheckAlleBuren(Position coords){
-
-        Iterable<Position> buren  = getSameNeighbourPositions(coords);
-        Iterator iterator = buren.iterator();
-        //System.out.println(buren);
-
-        //count op 1 zodat waarde zelf wordt meegeteld
-        int count = 1;
-        for (Object i : buren){
-            count++;
-        }
-
-        //System.out.println(count);
-
-        if(count >= 3) {
-            addScore(count);
-            grid.replaceCellAt(coords, generateRandomCandy());
-            while (iterator.hasNext()) {
-                Position posBuur = (Position) iterator.next();
-                grid.replaceCellAt(posBuur, generateRandomCandy());
-            }
-        }
-    }
-
-    Iterable<Position> getSameNeighbourPositions(Position position){
-        //gebruik de neighborPositions functie om de posities van de buren te vinden
-        //en controleer of de waarde van de buur overeenkomt met de waarde van de positie
-        //return een iterable van posities die dezelfde waarde hebben als de positie
-        ArrayList<Position> buren = new ArrayList<>();
-        for(Position p : position.neighborPositions()){
-            //check if the cany is the same
-            if(grid.getCellAt(p) != null && grid.getCellAt(position) != null && grid.getCellAt(p).equals(grid.getCellAt(position))){
-                buren.add(p);
-            }
-        }
-        return buren;
-    }
-    */
     //opdracht 12 functies
     public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
         //neemt de eerste 2 elementen van de lijst
@@ -295,17 +154,10 @@ public class CandyCrushModel {
         }
         Position bovenPos = new Position(pos.row() - 1, pos.col(), pos.bord());
 
-        //pos 1 null
         if(grid.getCellAt(pos) == null){
-            //System.out.println(grid.getCellAt(pos));
-            //positie erboven is null
             if (grid.getCellAt(bovenPos) == null) {
                 fallDownTo(bovenPos);
             }
-            //nog eens dubbel checken of deze null is wanneer je bv op het eind zit van een lijst
-            //anders kom je volgens mij in een ondeindige loop terecht waarbij je de hele tijd fallDownTO oproept omdat je de hele
-            //tijd Null in een positie zet zoals in een voorbeeld waarbij je 0011 hebt
-            //hierbij zou deze tussen de 2 switchen
             if(grid.getCellAt(bovenPos) != null){
                 grid.replaceCellAt(pos, grid.getCellAt(bovenPos));
                 grid.replaceCellAt(bovenPos, null);
@@ -328,6 +180,8 @@ public class CandyCrushModel {
         return true;
     }
 
+    //opdracht 14 functies
+    
     /*
 
     //eerst proberen de beste optie te vinden voor dat deze na een actie terug kijkt

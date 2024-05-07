@@ -1,7 +1,6 @@
 package be.kuleuven.candycrush.model;
 
-import be.kuleuven.candycrush.model.CandyCrushModel.*;
-import org.junit.jupiter.api.BeforeEach;
+import be.kuleuven.candycrush.model.candys.NormalCandy;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

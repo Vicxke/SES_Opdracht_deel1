@@ -43,19 +43,6 @@ public class CandyCrushGameController {
     public void resetGame(){
         game.resetGame();
         view.update();
-
-        //debug code
-
-        //System.out.println(game.findAllMatches());
-        //CandyCrushModel.Position pos = new CandyCrushModel.Position(8, 8, game.getSize());
-        //System.out.println(pos.walkRight().toList());
-        //System.out.println(pos.walkDown().toList());
-
-        //System.out.println(game.longestMatchDown(pos));
-        //System.out.println(game.longestMatchToRight(pos));
-        //System.out.println(game.firstTwoHaveCandy(game.getGrid().getCellAt(pos), pos.walkRight()));
-        //System.out.println(game.horizontalStartingPositions().toList());
-        //System.out.println(game.verticalStartingPositions().toList());
     }
 
     public void setNaamSpeler(String naamSpeler) {

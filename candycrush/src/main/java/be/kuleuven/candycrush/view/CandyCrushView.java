@@ -1,6 +1,8 @@
 package be.kuleuven.candycrush.view;
 
-import be.kuleuven.candycrush.model.CandyCrushModel;
+import be.kuleuven.candycrush.model.*;
+import be.kuleuven.candycrush.model.Position;
+import be.kuleuven.candycrush.model.candys.*;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -12,7 +14,8 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.List;
 
-import static be.kuleuven.candycrush.model.CandyCrushModel.Position.fromIndex;
+import static be.kuleuven.candycrush.model.Position.fromIndex;
+
 
 public class CandyCrushView extends Region {
     private AnchorPane speelVeld;
@@ -30,32 +33,32 @@ public class CandyCrushView extends Region {
         update();
     }
 
-    public Node makeCandyShape(CandyCrushModel.Position position, CandyCrushModel.Candy candy){
+    public Node makeCandyShape(Position position, Candy candy){
         int x = position.col()*game.getCircleRadius();
         int y = position.row()*game.getCircleRadius();
 
         return switch (candy) {
-            case CandyCrushModel.NormalCandy normalCandy -> {
+            case NormalCandy normalCandy -> {
                 Circle circle = new Circle(x + game.getCircleRadius()/2, y + game.getCircleRadius()/2, game.getCircleRadius()/2);
                 circle.setFill(getCorrectColor(normalCandy.color()));
                 yield circle;
             }
-            case CandyCrushModel.Stheefje stheefje -> {
+            case Stheefje stheefje -> {
                 Rectangle rectangle = new Rectangle(x , y, game.getCircleRadius(), game.getCircleRadius());
                 rectangle.setFill(Color.BROWN);
                 yield rectangle;
             }
-            case CandyCrushModel.bolleke bolleke -> {
+            case bolleke bolleke -> {
                 Rectangle rectangle = new Rectangle(x, y, game.getCircleRadius(), game.getCircleRadius());
                 rectangle.setFill(Color.DARKGREEN);
                 yield rectangle;
             }
-            case CandyCrushModel.petoterke petoterke -> {
+            case petoterke petoterke -> {
                 Rectangle rectangle = new Rectangle(x, y, game.getCircleRadius(), game.getCircleRadius());
                 rectangle.setFill(Color.ORANGE);
                 yield rectangle;
             }
-            case CandyCrushModel.haaariebooo haaariebooo -> {
+            case haaariebooo haaariebooo -> {
                 Rectangle rectangle = new Rectangle(x, y, game.getCircleRadius(), game.getCircleRadius());
                 rectangle.setFill(Color.LIME);
                 yield rectangle;
@@ -79,14 +82,10 @@ public class CandyCrushView extends Region {
     public void update(){
         lblbScore.setText(String.valueOf(game.getScore()));
         speelVeld.getChildren().clear();
-        //double circleWidth = game.getCircleRadius();//(speelveld.getPrefWidth() / game.getVeldBreedte()); //57
-        //double circleHeight = (speelveld.getPrefHeight() / game.getVeldHooghte()); //40
-        //int b = game.getBoard().breedte();
         for (int i = 0; i < game.getGrid().getSize().boardSize(); i++) {
 
-            CandyCrushModel.Position pos = fromIndex(i, game.getSize());
+            Position pos = fromIndex(i, game.getSize());
             Node candy = makeCandyShape(pos,game.getGrid().getCellAt(pos));
-            //System.out.println("X: " + candy.getBoundsInParent().getMinX() + " Y: " + candy.getBoundsInParent().getMinY());
 
             if(candy != null){
                 candy.setOnMouseClicked(e -> onCircleClick(e));
