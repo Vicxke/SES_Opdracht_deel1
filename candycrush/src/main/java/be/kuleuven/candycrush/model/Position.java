@@ -61,6 +61,16 @@ public record Position(int row, int col, BoardSize bord){
         return this.bord.positions().stream().filter(pos -> pos.col == this.col && pos.row >= this.row).sorted(Comparator.comparingInt(Position::row));
     }
 
+    public boolean isRightNextTo(Position pos){
+        if(walkDown().limit(2).toList().contains(pos) || walkUp().limit(2).toList().contains(pos)){
+            return true;
+        }
+        if(walkRight().limit(2).toList().contains(pos) || walkLeft().limit(2).toList().contains(pos)){
+            return true;
+        }
+        return false;
+    }
+
     public boolean isLastColumn(){
         //die aangeeft of de positie de laatste is in een rij.
         return this.col == bord.breedte() - 1;

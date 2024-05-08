@@ -1,6 +1,10 @@
 package be.kuleuven.candycrush;
 
+import be.kuleuven.candycrush.model.BoardSize;
+import be.kuleuven.candycrush.model.Candy;
 import be.kuleuven.candycrush.model.CandyCrushModel;
+import be.kuleuven.candycrush.model.Position;
+import be.kuleuven.candycrush.model.candys.NormalCandy;
 import be.kuleuven.candycrush.view.CandyCrushView;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -32,8 +36,10 @@ public class CandyCrushGameController {
 
     @FXML
     private void initialize(){
-        this.game = new CandyCrushModel(10, 10);
+        this.game = model1; //new CandyCrushModel(10, 10);
         this.view  = new CandyCrushView(game, gameView, speelveld, lblScore);
+
+        game.maximizeScore();
 
         updateView();
 
@@ -52,5 +58,49 @@ public class CandyCrushGameController {
 
     public void updateView(){
         view.update();
+    }
+
+    CandyCrushModel model1 = createBoardFromString("""
+   @@o#
+   o*#o
+   @@**
+   *#@@""");
+
+    CandyCrushModel model2 = createBoardFromString("""
+   #oo##
+   #@o@@
+   *##o@
+   @@*@o
+   **#*o""");
+
+    CandyCrushModel model3 = createBoardFromString("""
+   #@#oo@
+   @**@**
+   o##@#o
+   @#oo#@
+   @*@**@
+   *#@##*""");
+
+    public static CandyCrushModel createBoardFromString(String configuration) {
+        var lines = configuration.toLowerCase().lines().toList();
+        BoardSize size = new BoardSize(lines.size(), lines.getFirst().length());
+        var model = new CandyCrushModel(size.breedte(), size.hoogte());
+        for (int row = 0; row < lines.size(); row++) {
+            var line = lines.get(row);
+            for (int col = 0; col < line.length(); col++) {
+                model.getGrid().replaceCellAt(new Position(row, col, size), characterToCandy(line.charAt(col)));
+            }
+        }
+        return model;
+    }
+
+    private static Candy characterToCandy(char c) {
+        return switch(c) {
+            case 'o' -> new NormalCandy(0);
+            case '*' -> new NormalCandy(1);
+            case '#' -> new NormalCandy(2);
+            case '@' -> new NormalCandy(3);
+            default -> throw new IllegalArgumentException("Unexpected value: " + c);
+        };
     }
 }

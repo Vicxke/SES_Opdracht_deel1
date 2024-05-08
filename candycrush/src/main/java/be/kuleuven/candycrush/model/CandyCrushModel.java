@@ -72,53 +72,54 @@ public class CandyCrushModel {
 
         if(!pos.equals(previousClicked)){
             //swap these positions
-            doSwap(previousClicked, pos);
-            updateBoard();
+            Swap swap = new Swap(previousClicked, pos);
+            doSwap(swap, grid);
+            updateBoard(grid);
             previousClicked = null;
         }
     }
 
 
     //opdracht 12 functies
-    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions) {
+    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions, Board<Candy> bord) {
         //neemt de eerste 2 elementen van de lijst
         List<Position> positionList = positions.limit(2).toList();
         if(positionList.size() < 2) return false;
 
         //geeft alle matches terug met die candy
         return positionList.stream()
-                .allMatch(pos -> grid.getCellAt(pos) != null && grid.getCellAt(pos).equals(candy));
+                .allMatch(pos -> bord.getCellAt(pos) != null && bord.getCellAt(pos).equals(candy));
     }
 
 
     //geen idee of dit een probleem is maar momenteel als je een lengte langer als 2 hebt dan heb je meerdere posities voor dezelfde candy groep
-    public Stream<Position> horizontalStartingPositions() {
-        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(grid.getCellAt(pos), pos.walkLeft())).filter(pos -> grid.getCellAt(pos) != null);
+    public Stream<Position> horizontalStartingPositions(Board<Candy> bord) {
+        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(bord.getCellAt(pos), pos.walkLeft(), bord)).filter(pos -> bord.getCellAt(pos) != null);
     }
 
-    public Stream<Position> verticalStartingPositions() {
-        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(grid.getCellAt(pos), pos.walkUp())).filter(pos -> grid.getCellAt(pos) != null);
+    public Stream<Position> verticalStartingPositions(Board<Candy> bord) {
+        return size.positions().stream().filter(pos -> !firstTwoHaveCandy(bord.getCellAt(pos), pos.walkUp(), bord)).filter(pos -> bord.getCellAt(pos) != null);
     }
 
-    public List<Position> longestMatchToRight(Position pos) {
-        Candy candy = grid.getCellAt(pos);
-        return pos.walkRight().takeWhile(p -> grid.getCellAt(p) != null && grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+    public List<Position> longestMatchToRight(Position pos, Board<Candy> bord) {
+        Candy candy = bord.getCellAt(pos);
+        return pos.walkRight().takeWhile(p -> bord.getCellAt(p) != null && bord.getCellAt(p).equals(candy)).collect(Collectors.toList());
     }
 
-    public List<Position> longestMatchDown(Position pos) {
-        Candy candy = grid.getCellAt(pos);
-        return pos.walkDown().takeWhile(p -> grid.getCellAt(p) != null && grid.getCellAt(p).equals(candy)).collect(Collectors.toList());
+    public List<Position> longestMatchDown(Position pos, Board<Candy> bord) {
+        Candy candy = bord.getCellAt(pos);
+        return pos.walkDown().takeWhile(p -> bord.getCellAt(p) != null && bord.getCellAt(p).equals(candy)).collect(Collectors.toList());
     }
 
-    public Set<List<Position>> findAllMatches() {
+    public Set<List<Position>> findAllMatches(Board<Candy> bord) {
         Set<List<Position>> matches = new HashSet<>();
-        Stream.concat(horizontalStartingPositions(), verticalStartingPositions())
+        Stream.concat(horizontalStartingPositions(bord), verticalStartingPositions(bord))
             .forEach(pos -> {
-                List<Position> matchRight = longestMatchToRight(pos);
+                List<Position> matchRight = longestMatchToRight(pos, bord);
                 if (matchRight.size() >= 3) {
                     matches.add(matchRight);
                 }
-                List<Position> matchDown = longestMatchDown(pos);
+                List<Position> matchDown = longestMatchDown(pos, bord);
                 if (matchDown.size() >= 3) {
                     matches.add(matchDown);
                 }
@@ -132,55 +133,84 @@ public class CandyCrushModel {
 
     //opdracht 13 functies
 
-    public void clearMatch(List<Position> match){
+    public void clearMatch(List<Position> match, Board<Candy> bord){
         if (match.isEmpty()) {
             return;
         }
         score++;
         Position pos = match.get(0);
-        grid.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
+        bord.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
 
         //ik denk dat dit hier wel mag
-        fallDownTo(pos); // Laat snoepjes vallen
+        fallDownTo(pos, bord); // Laat snoepjes vallen
 
         match.remove(0); // Verwijder het eerste element uit de lijst
-        clearMatch(match); // Roep de methode opnieuw aan met de bijgewerkte lijst
+        clearMatch(match, bord); // Roep de methode opnieuw aan met de bijgewerkte lijst
     }
 
-    public void fallDownTo(Position pos){
+    public void fallDownTo(Position pos, Board<Candy> bord){
 
         if (pos.row() == 0) {
             return;
         }
         Position bovenPos = new Position(pos.row() - 1, pos.col(), pos.bord());
 
-        if(grid.getCellAt(pos) == null){
-            if (grid.getCellAt(bovenPos) == null) {
-                fallDownTo(bovenPos);
+        if(bord.getCellAt(pos) == null){
+            if (bord.getCellAt(bovenPos) == null) {
+                fallDownTo(bovenPos, bord);
             }
-            if(grid.getCellAt(bovenPos) != null){
-                grid.replaceCellAt(pos, grid.getCellAt(bovenPos));
-                grid.replaceCellAt(bovenPos, null);
-                fallDownTo(bovenPos);
+            if(bord.getCellAt(bovenPos) != null){
+                bord.replaceCellAt(pos, bord.getCellAt(bovenPos));
+                bord.replaceCellAt(bovenPos, null);
+                fallDownTo(bovenPos, bord);
             }
         }else{
-            fallDownTo(bovenPos);
+            fallDownTo(bovenPos, bord);
         }
     }
 
-    public boolean updateBoard(){
-        Set<List<Position>> matches = findAllMatches();
+    public boolean updateBoard(Board<Candy> bord){
+        Set<List<Position>> matches = findAllMatches(bord);
         if (matches.isEmpty()) {
             return false;
         }
 
         List<Position> match = matches.iterator().next();
-        clearMatch(match);
-        updateBoard();
+        clearMatch(match, bord);
+        updateBoard(bord);
         return true;
     }
 
     //opdracht 14 functies
+
+    boolean matchAfterSwitch(Swap swap, Board<Candy> bord) {
+        //switch match
+        simpleSwap(swap, bord);
+        Set<List<Position>> matches = findAllMatches(bord);
+        simpleSwap(swap, bord);
+        return !matches.isEmpty();
+    }
+
+    private void doSwap(Swap swap, Board<Candy> bord) {
+        if(swap.getPos1() == null || swap.getPos2() == null){
+            return;
+        }
+        if(!matchAfterSwitch(swap, bord)){
+            return;
+        }
+        if (swap.getPos1().isRightNextTo(swap.getPos2())) {
+            simpleSwap(swap, bord);
+        }
+    }
+
+    private void simpleSwap(Swap swap, Board<Candy> bord) {
+        if(swap.getPos1() == null || swap.getPos2() == null){
+            return;
+        }
+        Candy temp = bord.getCellAt(swap.getPos1());
+        bord.replaceCellAt(swap.getPos1(), bord.getCellAt(swap.getPos2()));
+        bord.replaceCellAt(swap.getPos2(), temp);
+    }
     
     /*
 
@@ -207,66 +237,52 @@ public class CandyCrushModel {
 
     }*/
 
-    public void maxScore() {
-        grid.setMaxScore(0);
-        List<Swap> bestSequence = grid.getBestSequence();
-        maximizeScore(new ArrayList<>(), 0);
+    public void maximizeScore() {
 
-        System.out.println("Max score: " + grid.getMaxScore());
-        System.out.println("amount of moves: " + grid.getBestSequence().size());
+        Board<Candy> bord = new Board<>(size);
+        grid.copyTo(bord);
+        bord.setMaxScore(0);
+        List<Swap> bestSequence = bord.getBestSequence();
+        GetAllSolutions(new ArrayList<>(), 0, bord);
+
+        System.out.println("Max score: " + bord.getMaxScore());
+        System.out.println("amount of moves: " + bord.getBestSequence().size());
+        System.out.println("Moves to make: ");
+        for (Swap swap : bord.getBestSequence()) {
+            System.out.print("move " + swap.getPos1());
+            System.out.print(" to " + swap.getPos2() + "\n");
+        }
+
     }
 
-    private void maximizeScore(List<Swap> sequence, int score) {
-        if (score > grid.getMaxScore()) {
-            grid.setMaxScore(score);
-            grid.setBestSequence(new ArrayList<>(sequence));
+    private void GetAllSolutions(List<Swap> sequence, int score, Board<Candy> bord) {
+        //score = countMatches(bord);
+        updateBoard(bord);
+        //aanpassen als de sequence beter is
+        if (score > bord.getMaxScore()) {
+            bord.setMaxScore(score);
+            bord.setBestSequence(new ArrayList<>(sequence));
         }
 
         for (Position pos : size.positions()) {
             for (Position neighbor : pos.neighborPositions()) {
-                Swap swap = new Swap(pos, neighbor);
-                if (isValidSwap(swap)) {
-                    swap.swap(grid);
-                    int newScore = score + countMatches();
-                    sequence.add(swap);
-                    maximizeScore(sequence, newScore);
-                    sequence.remove(swap);
-                    swap.swap(grid);
+                if(pos.isRightNextTo(neighbor)){
+                    Swap swap = new Swap(pos, neighbor);
+                    if (matchAfterSwitch(swap, bord)){
+                        doSwap(swap, bord);
+                        int newScore = score + countMatches(bord);
+                        sequence.add(swap);
+                        GetAllSolutions(sequence, newScore, bord);
+                        sequence.remove(swap);
+                        doSwap(swap, bord);
+                    }
                 }
             }
         }
     }
 
-    private boolean isValidSwap(Swap swap) {
-        if(swap == null){
-            return false;
-        }
-        if(grid.getCellAt(swap.getPos1()) == null || grid.getCellAt(swap.getPos2()) == null){
-            return false;
-        }
-        return true;
-    }
-
-    private void doSwap(Position pos1, Position pos2) {
-        if(pos1 == null || pos2 == null){
-            return;
-        }
-        Candy temp = grid.getCellAt(pos1);
-        grid.replaceCellAt(pos1, grid.getCellAt(pos2));
-        grid.replaceCellAt(pos2, temp);
-    }
-
-
-    private int countMatches() {
-        return findAllMatches().stream().mapToInt(List::size).sum();
-    }
-
-    boolean matchAfterSwitch() {
-        Set<List<Position>> matches = findAllMatches();
-        if (matches.isEmpty()) {
-            return false;
-        }
-        return true;
+    private int countMatches(Board<Candy> bord) {
+        return findAllMatches(bord).stream().mapToInt(List::size).sum();
     }
 
     public void addScore(int waarde){
@@ -276,7 +292,7 @@ public class CandyCrushModel {
     public void resetGame(){
         score = 0;
         generateGrid();
-        updateBoard();
+        updateBoard(grid);
     }
 
     public BoardSize getSize() {

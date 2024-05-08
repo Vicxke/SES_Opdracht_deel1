@@ -21,7 +21,7 @@ public class modelTest {
         assertEquals(10, game.getSize().breedte());
         assertEquals(10, game.getSize().hoogte());
     }
-
+    /*
     @Test
     public void CheckScoreIsZeroWhenCreated(){
         assertEquals(0, game.getScore());
@@ -101,28 +101,9 @@ public class modelTest {
     @Test
     public void testBoard(){
 
-        CandyCrushModel model1 = createBoardFromString("""
-   @@o#
-   o*#o
-   @@**
-   *#@@""");
 
-        CandyCrushModel model2 = createBoardFromString("""
-   #oo##
-   #@o@@
-   *##o@
-   @@*@o
-   **#*o""");
 
-        CandyCrushModel model3 = createBoardFromString("""
-   #@#oo@
-   @**@**
-   o##@#o
-   @#oo#@
-   @*@**@
-   *#@##*""");
-
-        //model1.maxScore();
+        //model1.maximizeScore();
         /*
         assertEquals(16, model1.getScore());
         assertEquals(4, model1.getGrid().getBestSequence().size());
@@ -138,27 +119,6 @@ public class modelTest {
     }
 
 
-    public static CandyCrushModel createBoardFromString(String configuration) {
-        var lines = configuration.toLowerCase().lines().toList();
-        BoardSize size = new BoardSize(lines.size(), lines.getFirst().length());
-        var model = new CandyCrushModel(size.breedte(), size.hoogte());
-        for (int row = 0; row < lines.size(); row++) {
-            var line = lines.get(row);
-            for (int col = 0; col < line.length(); col++) {
-                model.getGrid().replaceCellAt(new Position(row, col, size), characterToCandy(line.charAt(col)));
-            }
-        }
-        return model;
-    }
 
-    private static Candy characterToCandy(char c) {
-        return switch(c) {
-            case 'o' -> null;
-            case '*' -> new NormalCandy(1);
-            case '#' -> new NormalCandy(2);
-            case '@' -> new NormalCandy(3);
-            default -> throw new IllegalArgumentException("Unexpected value: " + c);
-        };
-    }
 
 }

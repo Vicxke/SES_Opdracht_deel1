@@ -31,9 +31,11 @@ public class Board<T> {
 
         if (oldCell != null) {
             Set<Position> positions = reverseCells.get(oldCell);
-            positions.remove(position);
-            if (positions.isEmpty()) {
-                reverseCells.remove(oldCell);
+            if(positions != null) {
+                positions.remove(position);
+                if (positions.isEmpty()) {
+                    reverseCells.remove(oldCell);
+                }
             }
         }
         reverseCells.computeIfAbsent(newCell, k -> new HashSet<>()).add(position);
