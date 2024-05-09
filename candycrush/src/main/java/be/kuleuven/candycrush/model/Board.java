@@ -11,15 +11,10 @@ public class Board<T> {
     private final Map<Position, T> cells;
     private final Map<T, Set<Position>> reverseCells;
 
-    private int maxScore;
-    private List<Swap> bestSequence;
-
     public Board(BoardSize size) {
         this.size = size;
         this.cells = new HashMap<>();
         this.reverseCells = new HashMap<>();
-        maxScore = 0;
-        bestSequence = new ArrayList<>();
     }
 
     public T getCellAt(Position position) {
@@ -73,20 +68,5 @@ public class Board<T> {
 
     public Map<Position, T> getCells() {
         return new HashMap<>(cells);
-    }
-
-    public void setMaxScore(int maxScore) {
-        this.maxScore = maxScore;
-    }
-    public int getMaxScore() {
-        return maxScore;
-    }
-
-    public List<Swap> getBestSequence() {
-        return bestSequence;
-    }
-
-    public void setBestSequence(List<Swap> bestSequence) {
-        this.bestSequence = bestSequence;
     }
 }

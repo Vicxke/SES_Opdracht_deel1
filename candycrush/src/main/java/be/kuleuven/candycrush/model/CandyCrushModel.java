@@ -74,7 +74,8 @@ public class CandyCrushModel {
             //swap these positions
             Swap swap = new Swap(previousClicked, pos);
             doSwap(swap, grid);
-            updateBoard(grid);
+            score += countMatches(grid);
+            updateBoard(grid, findAllMatches(grid));
             previousClicked = null;
         }
     }
@@ -137,12 +138,12 @@ public class CandyCrushModel {
         if (match.isEmpty()) {
             return;
         }
-        score++;
+        //score++;
         Position pos = match.get(0);
         bord.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
 
         //ik denk dat dit hier wel mag
-        fallDownTo(pos, bord); // Laat snoepjes vallen
+        //fallDownTo(pos, bord); // Laat snoepjes vallen
 
         match.remove(0); // Verwijder het eerste element uit de lijst
         clearMatch(match, bord); // Roep de methode opnieuw aan met de bijgewerkte lijst
@@ -169,21 +170,37 @@ public class CandyCrushModel {
         }
     }
 
-    public boolean updateBoard(Board<Candy> bord){
-        Set<List<Position>> matches = findAllMatches(bord);
+    public boolean updateBoard(Board<Candy> bord, Set<List<Position>> matches){
+
         if (matches.isEmpty()) {
             return false;
         }
 
-        List<Position> match = matches.iterator().next();
-        clearMatch(match, bord);
-        updateBoard(bord);
+        Iterator<List<Position>> iterator = matches.iterator();
+        List<Position> match = iterator.next(); // Haal de eerste match op
+        iterator.remove(); // Verwijder de eerste match
+
+        List<Position> copyMatch = new ArrayList<>(match);
+        clearMatch(copyMatch, bord);
+
+        updateBoard(bord, matches);
+        //hierna alles matches laten vallen
+        for (Position pos : match) {
+            fallDownTo(pos, bord);
+        }
+
         return true;
     }
 
     //opdracht 14 functies
 
     boolean matchAfterSwitch(Swap swap, Board<Candy> bord) {
+        if(swap.getPos1() == null || swap.getPos2() == null){
+            return false;
+        }
+        if(bord.getCellAt(swap.getPos1()) == null || bord.getCellAt(swap.getPos2()) == null){
+            return false;
+        }
         //switch match
         simpleSwap(swap, bord);
         Set<List<Position>> matches = findAllMatches(bord);
@@ -192,9 +209,6 @@ public class CandyCrushModel {
     }
 
     private void doSwap(Swap swap, Board<Candy> bord) {
-        if(swap.getPos1() == null || swap.getPos2() == null){
-            return;
-        }
         if(!matchAfterSwitch(swap, bord)){
             return;
         }
@@ -204,9 +218,6 @@ public class CandyCrushModel {
     }
 
     private void simpleSwap(Swap swap, Board<Candy> bord) {
-        if(swap.getPos1() == null || swap.getPos2() == null){
-            return;
-        }
         Candy temp = bord.getCellAt(swap.getPos1());
         bord.replaceCellAt(swap.getPos1(), bord.getCellAt(swap.getPos2()));
         bord.replaceCellAt(swap.getPos2(), temp);
@@ -237,49 +248,92 @@ public class CandyCrushModel {
 
     }*/
 
+
+    public ArrayList<Swap> possibleSwaps(Board<Candy> bord){
+        ArrayList<Swap> swaps = new ArrayList<>();
+        //System.out.println(bord.getSize().positions());
+        for (Position pos : bord.getSize().positions()) {
+            for(Position p : pos.neighborPositions()){
+                Swap swap = new Swap(pos, p);
+                if(swaps.stream().noneMatch(s -> s.getPos1().equals(p) && s.getPos2().equals(pos))){
+                    if(pos.isRightNextTo(p) && matchAfterSwitch(swap, bord)){
+                        swaps.add(swap);
+                    }
+                }
+
+            }
+        }
+        return swaps;
+    }
+
     public void maximizeScore() {
 
-        Board<Candy> bord = new Board<>(size);
-        grid.copyTo(bord);
-        bord.setMaxScore(0);
-        List<Swap> bestSequence = bord.getBestSequence();
-        GetAllSolutions(new ArrayList<>(), 0, bord);
 
-        System.out.println("Max score: " + bord.getMaxScore());
-        System.out.println("amount of moves: " + bord.getBestSequence().size());
+        Board<Candy> bord = new Board<>(grid.getSize());
+        grid.copyTo(bord);
+
+        //deze functie is correct normaal
+        System.out.println("max pos moves: " + possibleSwaps(bord).size());
+
+        Solution solution = new Solution(0, new ArrayList<>(), bord);
+        Solution optimalsolution = GetOptimalSolutions(solution, null);
+
+        System.out.println("Max score: " + optimalsolution.getScore());
+        System.out.println("amount of moves: " + optimalsolution.getSwaps().size());
         System.out.println("Moves to make: ");
-        for (Swap swap : bord.getBestSequence()) {
+        for (Swap swap : optimalsolution.getSwaps()) {
             System.out.print("move " + swap.getPos1());
             System.out.print(" to " + swap.getPos2() + "\n");
         }
 
     }
-
-    private void GetAllSolutions(List<Swap> sequence, int score, Board<Candy> bord) {
-        //score = countMatches(bord);
-        updateBoard(bord);
-        //aanpassen als de sequence beter is
-        if (score > bord.getMaxScore()) {
-            bord.setMaxScore(score);
-            bord.setBestSequence(new ArrayList<>(sequence));
-        }
-
-        for (Position pos : size.positions()) {
-            for (Position neighbor : pos.neighborPositions()) {
-                if(pos.isRightNextTo(neighbor)){
-                    Swap swap = new Swap(pos, neighbor);
-                    if (matchAfterSwitch(swap, bord)){
-                        doSwap(swap, bord);
-                        int newScore = score + countMatches(bord);
-                        sequence.add(swap);
-                        GetAllSolutions(sequence, newScore, bord);
-                        sequence.remove(swap);
-                        doSwap(swap, bord);
-                    }
-                }
+    private Solution GetOptimalSolutions(Solution current, Solution bestSoFar){
+        Board<Candy> oldboard = current.getBord();
+        ArrayList<Swap> swaps = possibleSwaps(oldboard);
+        //if(current.isCompleted()){
+        if(swaps.isEmpty()) {
+            if(bestSoFar == null || current.isBetterThan(bestSoFar)){
+                return current;
+            }else{
+                return bestSoFar;
             }
         }
+
+
+        /*
+        if(swaps.isEmpty()) {
+            current.setCompleted();
+            return current;
+        }*/
+
+        for(Swap swap : swaps){
+            Board<Candy> bord = new Board<>(current.getBord().getSize());
+            oldboard.copyTo(bord);
+
+            //get all null in bord
+            //int newScore = current.getScore() + countMatches(bord);
+            //current.setScore(newScore);
+
+            doSwap(swap, bord);
+            int newScore = current.getScore() + countMatches(bord);
+            updateBoard(bord, findAllMatches(bord));
+
+            //int newScore = current.getScore() + countMatches(bord);
+
+            //score werkt nog nie helemaal correct want een snoepje kan dubbel geteld worden wanneeer je een verticale en horizontale match hebt
+            //int newScore = bord.getCells().entrySet().stream().filter(entry -> entry.getValue() == null).mapToInt(entry -> 1).sum();
+
+            ArrayList<Swap> newSwaps = new ArrayList<>(current.getSwaps());
+            newSwaps.add(swap);
+            //current.getSwaps().add(swap);
+
+            Solution newSolution = new Solution(newScore, newSwaps, bord);
+            bestSoFar = GetOptimalSolutions(newSolution, bestSoFar);
+        }
+
+        return bestSoFar;
     }
+
 
     private int countMatches(Board<Candy> bord) {
         return findAllMatches(bord).stream().mapToInt(List::size).sum();
@@ -292,7 +346,7 @@ public class CandyCrushModel {
     public void resetGame(){
         score = 0;
         generateGrid();
-        updateBoard(grid);
+        updateBoard(grid, findAllMatches(grid));
     }
 
     public BoardSize getSize() {
