@@ -266,7 +266,7 @@ public class CandyCrushModel {
         return swaps;
     }
 
-    public void maximizeScore() {
+    public Solution maximizeScore() {
 
 
         Board<Candy> bord = new Board<>(grid.getSize());
@@ -278,13 +278,7 @@ public class CandyCrushModel {
         Solution solution = new Solution(0, new ArrayList<>(), bord);
         Solution optimalsolution = GetOptimalSolutions(solution, null);
 
-        System.out.println("Max score: " + optimalsolution.getScore());
-        System.out.println("amount of moves: " + optimalsolution.getSwaps().size());
-        System.out.println("Moves to make: ");
-        for (Swap swap : optimalsolution.getSwaps()) {
-            System.out.print("move " + swap.getPos1());
-            System.out.print(" to " + swap.getPos2() + "\n");
-        }
+        return optimalsolution;
 
     }
     private Solution GetOptimalSolutions(Solution current, Solution bestSoFar){

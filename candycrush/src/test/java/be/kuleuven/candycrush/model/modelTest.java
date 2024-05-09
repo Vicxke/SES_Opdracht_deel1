@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 
+import static be.kuleuven.candycrush.CandyCrushGameController.createBoardFromString;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class modelTest {
@@ -99,23 +100,55 @@ public class modelTest {
 
 
     @Test
-    public void testBoard(){
+    public void testBoardModel1(){
+
+        CandyCrushModel model1 = createBoardFromString("""
+   @@o#
+   o*#o
+   @@**
+   *#@@""");
+
+        Solution sol = model1.maximizeScore();
+
+        assertEquals(16, sol.getScore());
+        assertEquals(4, sol.getSwaps().size());
+
+    }
+
+    @Test
+    public void testBoardModel2(){
+
+        CandyCrushModel model2 = createBoardFromString("""
+   #oo##
+   #@o@@
+   *##o@
+   @@*@o
+   **#*o""");
 
 
+        Solution sol = model2.maximizeScore();
 
-        //model1.maximizeScore();
-        /*
-        assertEquals(16, model1.getScore());
-        assertEquals(4, model1.getGrid().getBestSequence().size());
+        assertEquals(24, sol.getScore());
+        assertEquals(7, sol.getSwaps().size());
 
-        model2.maxScore();
-        assertEquals(24, model2.getScore());
-        assertEquals(7, model2.getGrid().getBestSequence().size());
+    }
 
-        model2.maxScore();
-        assertEquals(35, model3.getScore());
-        assertEquals(10, model3.getGrid().getBestSequence().size());
-        */
+    @Test
+    public void testBoardModel3(){
+        CandyCrushModel model3 = createBoardFromString("""
+   #@#oo@
+   @**@**
+   o##@#o
+   @#oo#@
+   @*@**@
+   *#@##*""");
+
+
+        Solution sol = model3.maximizeScore();
+
+        assertEquals(35, sol.getScore());
+        assertEquals(10, sol.getSwaps().size());
+
     }
 
 

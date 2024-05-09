@@ -1,9 +1,6 @@
 package be.kuleuven.candycrush;
 
-import be.kuleuven.candycrush.model.BoardSize;
-import be.kuleuven.candycrush.model.Candy;
-import be.kuleuven.candycrush.model.CandyCrushModel;
-import be.kuleuven.candycrush.model.Position;
+import be.kuleuven.candycrush.model.*;
 import be.kuleuven.candycrush.model.candys.NormalCandy;
 import be.kuleuven.candycrush.view.CandyCrushView;
 import javafx.fxml.FXML;
@@ -39,7 +36,15 @@ public class CandyCrushGameController {
         this.game = model2; //new CandyCrushModel(10, 10);
         this.view  = new CandyCrushView(game, gameView, speelveld, lblScore);
 
-        game.maximizeScore();
+        Solution sol = game.maximizeScore();
+
+        System.out.println("Max score: " + sol.getScore());
+        System.out.println("amount of moves: " + sol.getSwaps().size());
+        System.out.println("Moves to make: ");
+        for (Swap swap : sol.getSwaps()) {
+            System.out.print("move " + swap.getPos1());
+            System.out.print(" to " + swap.getPos2() + "\n");
+        }
 
         updateView();
 
