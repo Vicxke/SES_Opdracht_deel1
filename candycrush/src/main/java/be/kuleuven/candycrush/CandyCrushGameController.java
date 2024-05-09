@@ -13,6 +13,8 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 
+import java.util.ArrayList;
+
 public class CandyCrushGameController {
     CandyCrushModel game;
     CandyCrushView view;
@@ -33,7 +35,7 @@ public class CandyCrushGameController {
 
     @FXML
     private void initialize(){
-        this.game = model2; //new CandyCrushModel(10, 10);
+        this.game = model3; //new CandyCrushModel(10, 10);
         this.view  = new CandyCrushView(game, gameView, speelveld, lblScore);
 
         Solution sol = game.maximizeScore();
@@ -45,6 +47,9 @@ public class CandyCrushGameController {
             System.out.print("move " + swap.getPos1());
             System.out.print(" to " + swap.getPos2() + "\n");
         }
+
+        System.out.println("possble swaps: " + game.possibleSwaps(game.getGrid()).size());
+        ArrayList<Swap> swaps = game.possibleSwaps(game.getGrid());
 
         updateView();
 

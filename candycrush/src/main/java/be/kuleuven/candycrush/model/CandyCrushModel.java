@@ -77,6 +77,9 @@ public class CandyCrushModel {
             score += countMatches(grid);
             updateBoard(grid, findAllMatches(grid));
             previousClicked = null;
+
+            ArrayList<Swap> swaps = possibleSwaps(grid);
+            System.out.println("possble swaps: " + swaps.size());
         }
     }
 
@@ -189,6 +192,8 @@ public class CandyCrushModel {
             fallDownTo(pos, bord);
         }
 
+        Set<List<Position>> newMatches = findAllMatches(bord);
+        updateBoard(bord, newMatches);
         return true;
     }
 
