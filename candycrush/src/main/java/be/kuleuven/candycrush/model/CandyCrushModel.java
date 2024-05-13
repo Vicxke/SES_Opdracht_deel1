@@ -248,9 +248,6 @@ public class CandyCrushModel {
         Board<Candy> bord = new Board<>(grid.getSize());
         grid.copyTo(bord);
 
-        //deze functie is correct normaal
-        System.out.println("max pos moves: " + possibleSwaps(bord).size());
-
         Solution solution = new Solution(0, new ArrayList<>(), bord);
         Solution optimalsolution = GetOptimalSolutions(solution, null);
 
@@ -260,7 +257,8 @@ public class CandyCrushModel {
     private Solution GetOptimalSolutions(Solution current, Solution bestSoFar){
         Board<Candy> oldboard = current.getBord();
         ArrayList<Swap> swaps = possibleSwaps(oldboard);
-        //if(current.isCompleted()){
+
+        //we zijn aan het einde als deze swaps empty is.
         if(swaps.isEmpty()) {
             if(bestSoFar == null || current.isBetterThan(bestSoFar)){
                 return current;
@@ -283,7 +281,6 @@ public class CandyCrushModel {
             Solution newSolution = new Solution(newScore, newSwaps, bord);
             bestSoFar = GetOptimalSolutions(newSolution, bestSoFar);
         }
-
         return bestSoFar;
     }
 
