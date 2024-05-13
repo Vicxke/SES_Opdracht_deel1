@@ -28,9 +28,7 @@ public class CandyCrushModel {
         this.circleRadius = 30;
         this.score = 0;
         size = new BoardSize(veldBreedte, veldHooghte);
-        //this.grid = new ArrayList<Candy>();
         this.grid = new Board<>(size);
-        //generateGrid();
         resetGame();
     }
 
@@ -141,12 +139,8 @@ public class CandyCrushModel {
         if (match.isEmpty()) {
             return;
         }
-        //score++;
         Position pos = match.get(0);
         bord.replaceCellAt(pos, null); // Verwijder het snoepje op de positie
-
-        //ik denk dat dit hier wel mag
-        //fallDownTo(pos, bord); // Laat snoepjes vallen
 
         match.remove(0); // Verwijder het eerste element uit de lijst
         clearMatch(match, bord); // Roep de methode opnieuw aan met de bijgewerkte lijst
@@ -186,15 +180,6 @@ public class CandyCrushModel {
         List<Position> copyMatch = new ArrayList<>(match);
         clearMatch(copyMatch, bord);
 
-    /*
-        if(hasTheSameCoordinate(matches, copyMatch) != null){
-            List<Position> sameposMatch = hasTheSameCoordinate(matches, match);
-            clearMatch(sameposMatch, bord);
-
-            for (Position pos : sameposMatch) {
-                fallDownTo(pos, bord);
-            }
-        }*/
         updateBoard(bord, matches);
 
         //hierna alles matches laten vallen
@@ -208,16 +193,6 @@ public class CandyCrushModel {
         return true;
     }
 
-    public List<Position> hasTheSameCoordinate(Set<List<Position>> matches, List<Position> match){
-        for(List<Position> m : matches){
-            for (Position pos : m) {
-                if(match.contains(pos)){
-                    return m;
-                }
-            }
-        }
-        return null;
-    }
 
     //opdracht 14 functies
 
@@ -253,7 +228,6 @@ public class CandyCrushModel {
 
     public ArrayList<Swap> possibleSwaps(Board<Candy> bord){
         ArrayList<Swap> swaps = new ArrayList<>();
-        //System.out.println(bord.getSize().positions());
         for (Position pos : bord.getSize().positions()) {
             for(Position p : pos.neighborPositions()){
                 Swap swap = new Swap(pos, p);
@@ -295,33 +269,16 @@ public class CandyCrushModel {
             }
         }
 
-
-        /*
-        if(swaps.isEmpty()) {
-            current.setCompleted();
-            return current;
-        }*/
-
         for(Swap swap : swaps){
             Board<Candy> bord = new Board<>(current.getBord().getSize());
             oldboard.copyTo(bord);
-
-            //get all null in bord
-            //int newScore = current.getScore() + countMatches(bord);
-            //current.setScore(newScore);
 
             doSwap(swap, bord);
             int newScore = current.getScore() + countMatches(bord);
             updateBoard(bord, findAllMatches(bord));
 
-            //int newScore = current.getScore() + countMatches(bord);
-
-            //score werkt nog nie helemaal correct want een snoepje kan dubbel geteld worden wanneeer je een verticale en horizontale match hebt
-            //int newScore = bord.getCells().entrySet().stream().filter(entry -> entry.getValue() == null).mapToInt(entry -> 1).sum();
-
             ArrayList<Swap> newSwaps = new ArrayList<>(current.getSwaps());
             newSwaps.add(swap);
-            //current.getSwaps().add(swap);
 
             Solution newSolution = new Solution(newScore, newSwaps, bord);
             bestSoFar = GetOptimalSolutions(newSolution, bestSoFar);
