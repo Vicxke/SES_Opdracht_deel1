@@ -186,7 +186,17 @@ public class CandyCrushModel {
         List<Position> copyMatch = new ArrayList<>(match);
         clearMatch(copyMatch, bord);
 
+    /*
+        if(hasTheSameCoordinate(matches, copyMatch) != null){
+            List<Position> sameposMatch = hasTheSameCoordinate(matches, match);
+            clearMatch(sameposMatch, bord);
+
+            for (Position pos : sameposMatch) {
+                fallDownTo(pos, bord);
+            }
+        }*/
         updateBoard(bord, matches);
+
         //hierna alles matches laten vallen
         for (Position pos : match) {
             fallDownTo(pos, bord);
@@ -194,7 +204,19 @@ public class CandyCrushModel {
 
         Set<List<Position>> newMatches = findAllMatches(bord);
         updateBoard(bord, newMatches);
+
         return true;
+    }
+
+    public List<Position> hasTheSameCoordinate(Set<List<Position>> matches, List<Position> match){
+        for(List<Position> m : matches){
+            for (Position pos : m) {
+                if(match.contains(pos)){
+                    return m;
+                }
+            }
+        }
+        return null;
     }
 
     //opdracht 14 functies
@@ -227,31 +249,6 @@ public class CandyCrushModel {
         bord.replaceCellAt(swap.getPos1(), bord.getCellAt(swap.getPos2()));
         bord.replaceCellAt(swap.getPos2(), temp);
     }
-    
-    /*
-
-    //eerst proberen de beste optie te vinden voor dat deze na een actie terug kijkt
-    //dus gewoon het bord bekijken zoals het is en alle swaps uitbroperen.
-    public void maximumScore(int score, int swaps, Board<Candy> bord){
-
-        for (Position pos : size.positions()) {
-            for(Position p : pos.neighborPositions()){
-                doSwap(pos, p);
-                if(matchAfterSwitch()){
-                    //score is gelijk aan het aantal snoepjes in de matches
-                    score+=findAllMatches().stream().mapToInt(List::size).sum();
-                    swaps++;
-
-
-                    //als er een match is dan moet je kijken of je nog een match kan maken
-                    maximumScore(score, swaps, bord);
-                }else{
-                    undoSwap(pos, p);
-                }
-            }
-        }
-
-    }*/
 
 
     public ArrayList<Swap> possibleSwaps(Board<Candy> bord){

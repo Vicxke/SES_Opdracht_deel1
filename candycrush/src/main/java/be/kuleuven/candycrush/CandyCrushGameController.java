@@ -35,8 +35,9 @@ public class CandyCrushGameController {
 
     @FXML
     private void initialize(){
-        this.game = model3; //new CandyCrushModel(10, 10);
+        this.game = model2; //new CandyCrushModel(10, 10);
         this.view  = new CandyCrushView(game, gameView, speelveld, lblScore);
+
 
         Solution sol = game.maximizeScore();
 
