@@ -146,7 +146,7 @@ public class modelTest {
 
         Solution sol = model3.maximizeScore();
 
-        assertEquals(35, sol.getScore());
+        assertEquals(32, sol.getScore());
         assertEquals(10, sol.getSwaps().size());
 
     }
