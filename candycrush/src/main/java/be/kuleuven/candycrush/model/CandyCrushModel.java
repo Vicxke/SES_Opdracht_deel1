@@ -272,8 +272,8 @@ public class CandyCrushModel {
             oldboard.copyTo(bord);
 
             doSwap(swap, bord);
-            int newScore = current.getScore() + countMatches(bord);
             updateBoard(bord, findAllMatches(bord));
+            int newScore = bord.getCells().entrySet().stream().filter(entry -> entry.getValue() == null).mapToInt(entry -> 1).sum();
 
             ArrayList<Swap> newSwaps = new ArrayList<>(current.getSwaps());
             newSwaps.add(swap);

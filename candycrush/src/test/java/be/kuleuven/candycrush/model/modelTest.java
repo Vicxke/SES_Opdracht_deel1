@@ -128,7 +128,7 @@ public class modelTest {
 
         Solution sol = model2.maximizeScore();
 
-        assertEquals(24, sol.getScore());
+        assertEquals(23, sol.getScore());
         assertEquals(7, sol.getSwaps().size());
 
     }
@@ -146,8 +146,8 @@ public class modelTest {
 
         Solution sol = model3.maximizeScore();
 
-        assertEquals(32, sol.getScore());
-        assertEquals(10, sol.getSwaps().size());
+        assertEquals(33, sol.getScore());
+        assertEquals(9, sol.getSwaps().size());
 
     }
 
